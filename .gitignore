@@ -1,6 +1,10 @@
 data/raw/
 data/processed/
-results/
+# results: keep the summary table and raw timings; per-droplet predictions are regenerable
+results/*
+!results/metrics.tsv
+!results/bench/
+results/sensitivity/pred/
 logs/
 .snakemake/
 __pycache__/

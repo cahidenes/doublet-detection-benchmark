@@ -25,6 +25,8 @@ TOOLS = {t: v for t, v in config["tools"].items() if not config.get("only_tools"
 SEEDS = config["seeds"]
 MULTS = config["rate_multipliers"]
 INTERP = {k: os.path.expanduser(v) for k, v in config["interpreters"].items()}
+# where collect writes; the scaling experiment uses its own file (results/scaling_metrics.tsv)
+METRICS_OUT = config.get("metrics_out", "results/metrics.tsv")
 
 wildcard_constraints:
     ds="[^/]+", tool="[^/]+", seed=r"\d+", mult=r"[0-9.]+"
@@ -38,11 +40,12 @@ def targets(kind):
 
 
 rule all:
-    input: "results/metrics.tsv"
+    input: METRICS_OUT
 
 
 rule convert:
-    input: lambda w: RDS[w.ds]
+    # derived datasets (scripts/subsample.py) have no .rds and are never rebuilt here
+    input: lambda w: RDS.get(w.ds, [])
     output: directory("data/processed/{ds}")
     params: rscript=INTERP["r"]
     shell: "{params.rscript} scripts/convert_rds.R {input} {output}"
@@ -95,7 +98,7 @@ rule evaluate:
 
 rule collect:
     input: ev=targets("eval"), bm=targets("bench")
-    output: "results/metrics.tsv"
+    output: METRICS_OUT
     run:
         rows = []
         for e, b in zip(input.ev, input.bm):

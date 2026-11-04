@@ -48,3 +48,12 @@ default procedure (picking pK with labels would be tuning on the test set).
 Chord fails at 2× on HMEC-rep-MULTI and mkidney-ch (2× rate = 0.62 / 0.75):
 `overkillDB2 -> sample(): cannot take a sample larger than the population`. Chord cannot
 accept an expected rate above ~0.5. Recorded as failed; excluded from paired medians.
+
+### 2026-11-04 — Scaling (metric 9)
+`scripts/subsample.py` (nested stratified subsamples of HMEC-orig-MULTI, 1k–26k) +
+`analysis/scaling.py` → `results/scaling_summary.tsv`, `results/figures/scaling.png`. 78/78 ok,
+run one job at a time. At 26k droplets: Chord 670 s / 28 GB, Solo 379 s (GPU), DoubletFinder
+210 s / 23 GB, vaeda 186 s, scDblFinder 179 s / 7 GB, DoubletDetection 116 s, Scrublet 29 s,
+cxds 30 s. Caveat: peak RSS comes from Snakemake's periodic sampling, so short spikes can be
+missed (e.g. DoubletDetection 19 GB at 20k but 8 GB at 26k); treat memory as approximate.
+DoubletFinder grows sub-linearly above 10k because paramSweep subsamples to 10k cells.

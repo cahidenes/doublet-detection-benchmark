@@ -15,3 +15,5 @@ results/sensitivity/pred/
 results/sensitivity/eval/
 !results/robustness_summary.tsv
 !results/figures/
+!results/scaling_metrics.tsv
+!results/scaling_summary.tsv

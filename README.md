@@ -161,7 +161,8 @@ data/, results/, logs/   generated, not tracked in git
 - [x] Wrappers for all 13 methods; smoke test passes on `J293t-dm`, `hm-6k`, `pbmc-1A-dm`
 - [x] Full run on all 16 datasets (208/208 ok)
 - [x] Rate robustness (0.5×/2×): `analysis/robustness.py`; DoubletFinder pK sensitivity
-- [ ] Scaling with droplet number, tool agreement
+- [x] Scaling with droplet number: `scripts/subsample.py`, `analysis/scaling.py`
+- [ ] Tool agreement
 - [ ] Independent doublet simulation from labeled singlets
 - [ ] Statistics (Friedman + Wilcoxon/Holm, Cliff's δ), figures, report
 

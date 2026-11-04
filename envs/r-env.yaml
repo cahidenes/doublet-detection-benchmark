@@ -1,0 +1,26 @@
+name: dbl-r
+channels: [conda-forge, bioconda]
+dependencies:
+  - r-base=4.4
+  - r-matrix
+  - r-data.table
+  - r-optparse
+  - r-remotes
+  - r-seurat=5.*
+  - bioconductor-singlecellexperiment
+  - bioconductor-scdblfinder
+  - bioconductor-scds
+  # scds 1.22 (bcds, and Chord through it) uses the pre-3.0 xgboost() interface; 3.x fails with
+  # 'argument "y" is missing'. 2.1.4 is the last 2.x build for R 4.4.
+  - r-xgboost=2.1.4
+  - bioconductor-scuttle
+  # Chord dependencies: its DESCRIPTION has no Imports field, so install_github can't
+  # resolve them. NAMESPACE imports adabag/gbm/Rtsne/cowplot/rsvd/scater (+ the tools above).
+  - r-adabag
+  - r-gbm
+  - r-rtsne
+  - r-cowplot
+  - r-rsvd
+  - bioconductor-scater
+  - bioconductor-scran
+# DoubletFinder and Chord are GitHub-only: run envs/install_r_github.R afterwards.

@@ -1,0 +1,32 @@
+# Interpreter per conda env (no need to activate anything before running snakemake,
+# except an env that provides snakemake itself, e.g. dbl-py).
+interpreters:
+  py:    ~/miniforge3/envs/dbl-py/bin/python
+  r:     ~/miniforge3/envs/dbl-r/bin/Rscript
+  vaeda: ~/miniforge3/envs/dbl-vaeda/bin/python
+
+# env: which interpreter; rate: does the tool take an expected doublet rate?
+# (only rate: true tools are rerun at 0.5x/2x for metric 5); gpu: 1 = uses the GPU.
+tools:
+  libsize:          {env: py,    script: methods/baselines.py,            rate: false}
+  ngenes:           {env: py,    script: methods/baselines.py,            rate: false}
+  scrublet:         {env: py,    script: methods/scrublet_run.py,         rate: true}
+  doubletdetection: {env: py,    script: methods/doubletdetection_run.py, rate: false}
+  solo:             {env: py,    script: methods/solo_run.py,             rate: false, gpu: 1}
+  vaeda:            {env: vaeda, script: methods/vaeda_run.py,            rate: false, gpu: 1}
+  scdblfinder:      {env: r,     script: methods/scdblfinder_run.R,       rate: true}
+  dbldensity:       {env: r,     script: methods/scdblfinder_run.R,       rate: false}
+  cxds:             {env: r,     script: methods/scds_run.R,              rate: false}
+  bcds:             {env: r,     script: methods/scds_run.R,              rate: false}
+  hybrid:           {env: r,     script: methods/scds_run.R,              rate: false}
+  doubletfinder:    {env: r,     script: methods/doubletfinder_run.R,     rate: true}
+  chord:            {env: r,     script: methods/chord_run.R,             rate: true}
+
+seeds: [0]
+# Expected-rate multipliers for the robustness experiment (metric 5); 1.0 is the main run.
+rate_multipliers: [1.0]   # later: [0.5, 1.0, 2.0]
+
+# Leave empty to use every converted dataset; set e.g. [J293t-dm] for a smoke test.
+datasets: []
+# Optionally restrict to a subset of tools, e.g. [chord, vaeda]
+only_tools: []

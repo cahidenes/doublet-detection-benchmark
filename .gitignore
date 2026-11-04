@@ -1,0 +1,8 @@
+data/raw/
+data/processed/
+results/
+logs/
+.snakemake/
+__pycache__/
+*.Rhistory
+.RData

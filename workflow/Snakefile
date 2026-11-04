@@ -1,0 +1,105 @@
+"""Doublet-detection benchmark.
+
+  snakemake -s workflow/Snakefile --cores 8 --resources gpu=1                       # everything
+  snakemake -s workflow/Snakefile --cores 8 --resources gpu=1 --config datasets='[J293t-dm]'
+
+Run snakemake from an env that has it (dbl-py); each tool runs with its env's interpreter
+(config: interpreters). A tool that crashes does not stop the workflow: its prediction file
+records status=failed and the error, which ends up in metrics.tsv (usability metric).
+
+Layout:
+  data/raw/real_datasets/**/<ds>.rds      (from scripts/download_data.sh)
+  data/processed/<ds>/                    (convert)
+  results/pred/<tool>/<ds>/s<seed>_r<mult>.tsv
+  results/bench/<tool>/<ds>/s<seed>_r<mult>.tsv   (runtime + peak memory, from Snakemake)
+  results/eval/... and results/metrics.tsv
+"""
+import glob, os
+import pandas as pd
+
+configfile: "config/config.yaml"
+
+RDS = {os.path.basename(p)[:-4]: p for p in glob.glob("data/raw/real_datasets/**/*.rds", recursive=True)}
+DATASETS = config.get("datasets") or sorted(RDS)
+TOOLS = {t: v for t, v in config["tools"].items() if not config.get("only_tools") or t in config["only_tools"]}
+SEEDS = config["seeds"]
+MULTS = config["rate_multipliers"]
+INTERP = {k: os.path.expanduser(v) for k, v in config["interpreters"].items()}
+
+wildcard_constraints:
+    ds="[^/]+", tool="[^/]+", seed=r"\d+", mult=r"[0-9.]+"
+
+
+def targets(kind):
+    """All (tool, ds, seed, mult) runs; mult != 1 only for tools that take an expected rate."""
+    return [f"results/{kind}/{t}/{ds}/s{s}_r{m}.tsv"
+            for t, spec in TOOLS.items() for ds in DATASETS for s in SEEDS for m in MULTS
+            if float(m) == 1.0 or spec.get("rate")]
+
+
+rule all:
+    input: "results/metrics.tsv"
+
+
+rule convert:
+    input: lambda w: RDS[w.ds]
+    output: directory("data/processed/{ds}")
+    params: rscript=INTERP["r"]
+    shell: "{params.rscript} scripts/convert_rds.R {input} {output}"
+
+
+rule run_tool:
+    input: "data/processed/{ds}"
+    output: "results/pred/{tool}/{ds}/s{seed}_r{mult}.tsv"
+    benchmark: "results/bench/{tool}/{ds}/s{seed}_r{mult}.tsv"
+    log: "logs/{tool}/{ds}/s{seed}_r{mult}.log"
+    params:
+        script=lambda w: TOOLS[w.tool]["script"],
+        interp=lambda w: INTERP[TOOLS[w.tool]["env"]],
+        is_r=lambda w: TOOLS[w.tool]["env"] == "r",
+    threads: 4
+    resources: gpu=lambda w: TOOLS[w.tool].get("gpu", 0)
+    run:
+        import subprocess
+        # expected rate = multiplier x labeled rate (computed here, once the data exists)
+        lab = pd.read_csv(f"{input}/labels.tsv", sep="\t")
+        rate = float(wildcards.mult) * lab["is_doublet"].mean()
+        if params.is_r:
+            cmd = [params.interp, params.script, str(input), str(output), wildcards.ds,
+                   wildcards.tool, wildcards.seed, str(rate)]
+        else:
+            cmd = [params.interp, params.script, "--input", str(input), "--output", str(output),
+                   "--dataset", wildcards.ds, "--tool", wildcards.tool,
+                   "--seed", wildcards.seed, "--expected-rate", str(rate)]
+        env = dict(os.environ, OMP_NUM_THREADS=str(threads), MKL_NUM_THREADS=str(threads),
+                   PYTHONPATH="methods")
+        with open(log[0], "w") as fh:
+            rc = subprocess.run(cmd, stdout=fh, stderr=subprocess.STDOUT, env=env).returncode
+        if rc != 0 or not os.path.exists(output[0]):
+            err = open(log[0]).read().strip().splitlines()[-3:]
+            pd.DataFrame([{"status": "failed", "tool": wildcards.tool, "dataset": wildcards.ds,
+                           "seed": wildcards.seed, "expected_rate": rate,
+                           "error": " | ".join(err)[-500:]}]).to_csv(output[0], sep="\t", index=False)
+
+
+rule evaluate:
+    input:
+        pred="results/pred/{tool}/{ds}/s{seed}_r{mult}.tsv",
+        data="data/processed/{ds}",
+    output: "results/eval/{tool}/{ds}/s{seed}_r{mult}.tsv"
+    params: py=INTERP["py"]
+    shell: "{params.py} scripts/evaluate.py {input.pred} {input.data}/labels.tsv {output}"
+
+
+rule collect:
+    input: ev=targets("eval"), bm=targets("bench")
+    output: "results/metrics.tsv"
+    run:
+        rows = []
+        for e, b in zip(input.ev, input.bm):
+            r = pd.read_csv(e, sep="\t")
+            bm = pd.read_csv(b, sep="\t")
+            r["wall_s"], r["max_rss_mb"] = bm["s"].iloc[0], bm["max_rss"].iloc[0]
+            r["rate_mult"] = float(e.rsplit("_r", 1)[1][:-4])
+            rows.append(r)
+        pd.concat(rows).to_csv(output[0], sep="\t", index=False)

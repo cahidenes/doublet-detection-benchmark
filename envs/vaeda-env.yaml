@@ -1,0 +1,26 @@
+name: dbl-vaeda
+# Separate env: vaeda uses TensorFlow, which conflicts with scvi-tools (PyTorch).
+# vaeda 0.0.1 on PyPI declares bogus dependencies (random, math, pathlib, sklearn), so a plain
+# `pip install vaeda` fails. Install its real deps here, then vaeda itself without deps:
+#   mamba run -n dbl-vaeda pip install --no-deps git+https://github.com/kostkalab/vaeda@7b4979c12d
+# (PyPI 0.0.1 is also unimportable: absolute intra-package imports, plot_results.py missing.)
+# TF < 2.16 keeps Keras 2 (vaeda is 2023 code; Keras 3 changes the API).
+channels: [conda-forge]
+dependencies:
+  - python=3.10
+  - numpy<2
+  - scipy
+  - pandas
+  - matplotlib
+  - scikit-learn
+  - anndata
+  - scanpy
+  - kneed
+  - python-igraph   # sc.tl.leiden in vaeda/cluster.py; not declared by vaeda
+  - leidenalg
+  - pip
+  - pip:
+      - tensorflow[and-cuda]>=2.13,<2.16
+      # used by vaeda 0.0.30 but missing from its setup.py (tfp) or imported undeclared (seaborn)
+      - tensorflow-probability==0.23.0   # matches TF 2.15
+      - seaborn

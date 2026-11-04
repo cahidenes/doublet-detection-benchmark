@@ -1,0 +1,18 @@
+name: dbl-py
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.11
+  - snakemake=8.*
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - scanpy
+  - anndata
+  - matplotlib
+  - seaborn
+  - pip
+  - pip:
+      - scrublet
+      - doubletdetection
+      - scvi-tools   # Solo lives here now: scvi.external.SOLO

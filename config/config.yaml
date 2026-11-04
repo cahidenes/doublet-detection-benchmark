@@ -25,7 +25,7 @@ tools:
 
 seeds: [0]
 # Expected-rate multipliers for the robustness experiment (metric 5); 1.0 is the main run.
-rate_multipliers: [1.0]   # later: [0.5, 1.0, 2.0]
+rate_multipliers: [0.5, 1.0, 2.0]
 
 # Leave empty to use every converted dataset; set e.g. [J293t-dm] for a smoke test.
 datasets: []

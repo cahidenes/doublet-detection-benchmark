@@ -36,3 +36,15 @@ Score each 1–5 at the end: installation, documentation, ease of use, failure r
     slot missing on Seurat v5 assays, `reuse.pANN=FALSE` misread by DoubletFinder 2.0.6 → shims.
   - scDblFinder result on J293t-dm changed with xgboost 3.4.2 → 2.1.4 (AUPRC 0.222 → 0.211, calls 38 → 20):
     report the xgboost version used.
+
+### 2026-11-04 — DoubletFinder pK sensitivity (to revisit in the report)
+`analysis/df_pk_sensitivity.sh` → `results/sensitivity/df_pk.tsv`. AUPRC falls monotonically
+with pK on pbmc-ch, pbmc-2stim-dm, pbmc-1C-dm (e.g. pbmc-ch 0.50 at pK=0.005 vs 0.29 at 0.3).
+The automatic BCmvn choice picked pK=0.3 (pbmc-ch) and 0.13 (pbmc-2stim-dm), roughly halving
+AUPRC there. DoubletFinder's low rank is mainly its pK-selection step. Main ranking keeps the
+default procedure (picking pK with labels would be tuning on the test set).
+
+### 2026-11-04 — Rate robustness (metric 5)
+Chord fails at 2× on HMEC-rep-MULTI and mkidney-ch (2× rate = 0.62 / 0.75):
+`overkillDB2 -> sample(): cannot take a sample larger than the population`. Chord cannot
+accept an expected rate above ~0.5. Recorded as failed; excluded from paired medians.

@@ -10,3 +10,8 @@ logs/
 __pycache__/
 *.Rhistory
 .RData
+!results/sensitivity/
+results/sensitivity/pred/
+results/sensitivity/eval/
+!results/robustness_summary.tsv
+!results/figures/

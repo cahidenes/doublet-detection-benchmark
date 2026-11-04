@@ -17,9 +17,14 @@ seu <- FindVariableFeatures(seu, selection.method = "vst", nfeatures = 2000, ver
 seu <- ScaleData(seu, verbose = FALSE)
 seu <- RunPCA(seu, verbose = FALSE)
 
-sweep <- paramSweep(seu, PCs = PCs, sct = FALSE)
-bcmvn <- find.pK(summarizeSweep(sweep, GT = FALSE))
-pK <- as.numeric(as.character(bcmvn$pK[which.max(bcmvn$BCmetric)]))
+# DF_PK env var: fixed pK for the sensitivity analysis only (main run: automatic BCmvn choice)
+if (nzchar(Sys.getenv("DF_PK"))) {
+  pK <- as.numeric(Sys.getenv("DF_PK"))
+} else {
+  sweep <- paramSweep(seu, PCs = PCs, sct = FALSE)
+  bcmvn <- find.pK(summarizeSweep(sweep, GT = FALSE))
+  pK <- as.numeric(as.character(bcmvn$pK[which.max(bcmvn$BCmetric)]))
+}
 nExp <- round(d$rate * ncol(seu))
 message(sprintf("DoubletFinder: pK = %g, nExp = %d", pK, nExp))
 

@@ -82,7 +82,7 @@ The pipeline is a Snakemake workflow:
 ```
 
 ```bash
-SMK="$HOME/miniforge3/envs/dbl-py/bin/snakemake -s workflow/Snakefile --resources gpu=1"
+SMK="$HOME/miniforge3/envs/dbl-py/bin/snakemake -s workflow/Snakefile --resources gpu=1 heavy=1"
 
 $SMK --cores 16 --config datasets='[J293t-dm]'      # smoke test (~3 min)
 $SMK --cores 8                                       # all datasets (see memory note)
@@ -91,7 +91,8 @@ $SMK --cores 8 --config only_tools='[chord,vaeda]'   # subset of tools
 
 - Each tool runs with its own env's interpreter (`interpreters:` in `config/config.yaml`), so
   you don't need to activate any env.
-- `--resources gpu=1` runs one GPU tool at a time.
+- `--resources gpu=1 heavy=1` runs at most one GPU tool and one memory-heavy tool
+  (`heavy: 1` in the config) at a time.
 - If a tool crashes, its output records `status=failed` with the last lines of the error, and
   the workflow continues. Failures appear in `metrics.tsv`, because they count toward the
   usability metric. Full logs are in `logs/<tool>/<ds>/`.

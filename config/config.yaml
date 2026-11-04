@@ -6,21 +6,22 @@ interpreters:
   vaeda: ~/miniforge3/envs/dbl-vaeda/bin/python
 
 # env: which interpreter; rate: does the tool take an expected doublet rate?
-# (only rate: true tools are rerun at 0.5x/2x for metric 5); gpu: 1 = uses the GPU.
+# (only rate: true tools are rerun at 0.5x/2x for metric 5); gpu: 1 = uses the GPU;
+# heavy: 1 = high peak RAM (>5 GB on 6.8k droplets); run with --resources heavy=1 so only one runs at a time.
 tools:
   libsize:          {env: py,    script: methods/baselines.py,            rate: false}
   ngenes:           {env: py,    script: methods/baselines.py,            rate: false}
   scrublet:         {env: py,    script: methods/scrublet_run.py,         rate: true}
-  doubletdetection: {env: py,    script: methods/doubletdetection_run.py, rate: false}
+  doubletdetection: {env: py,    script: methods/doubletdetection_run.py, rate: false, heavy: 1}
   solo:             {env: py,    script: methods/solo_run.py,             rate: false, gpu: 1}
-  vaeda:            {env: vaeda, script: methods/vaeda_run.py,            rate: false, gpu: 1}
+  vaeda:            {env: vaeda, script: methods/vaeda_run.py,            rate: false, gpu: 1, heavy: 1}
   scdblfinder:      {env: r,     script: methods/scdblfinder_run.R,       rate: true}
-  dbldensity:       {env: r,     script: methods/scdblfinder_run.R,       rate: false}
+  dbldensity:       {env: r,     script: methods/scdblfinder_run.R,       rate: false, heavy: 1}
   cxds:             {env: r,     script: methods/scds_run.R,              rate: false}
   bcds:             {env: r,     script: methods/scds_run.R,              rate: false}
   hybrid:           {env: r,     script: methods/scds_run.R,              rate: false}
-  doubletfinder:    {env: r,     script: methods/doubletfinder_run.R,     rate: true}
-  chord:            {env: r,     script: methods/chord_run.R,             rate: true}
+  doubletfinder:    {env: r,     script: methods/doubletfinder_run.R,     rate: true, heavy: 1}
+  chord:            {env: r,     script: methods/chord_run.R,             rate: true, heavy: 1}
 
 seeds: [0]
 # Expected-rate multipliers for the robustness experiment (metric 5); 1.0 is the main run.

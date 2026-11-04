@@ -1,6 +1,6 @@
 """Doublet-detection benchmark.
 
-  snakemake -s workflow/Snakefile --cores 8 --resources gpu=1                       # everything
+  snakemake -s workflow/Snakefile --cores 8 --resources gpu=1 heavy=1               # everything
   snakemake -s workflow/Snakefile --cores 8 --resources gpu=1 --config datasets='[J293t-dm]'
 
 Run snakemake from an env that has it (dbl-py); each tool runs with its env's interpreter
@@ -58,7 +58,9 @@ rule run_tool:
         interp=lambda w: INTERP[TOOLS[w.tool]["env"]],
         is_r=lambda w: TOOLS[w.tool]["env"] == "r",
     threads: 4
-    resources: gpu=lambda w: TOOLS[w.tool].get("gpu", 0)
+    resources:
+        gpu=lambda w: TOOLS[w.tool].get("gpu", 0),
+        heavy=lambda w: TOOLS[w.tool].get("heavy", 0),
     run:
         import subprocess
         # expected rate = multiplier x labeled rate (computed here, once the data exists)

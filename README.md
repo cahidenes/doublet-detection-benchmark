@@ -57,6 +57,7 @@ M=~/miniforge3/bin/mamba
 $M env create -f envs/py-env.yaml       # dbl-py: Python tools + snakemake
 $M env create -f envs/r-env.yaml        # dbl-r: R tools
 $M env create -f envs/vaeda-env.yaml    # dbl-vaeda: TensorFlow (conflicts with PyTorch in dbl-py)
+# (to get the exact versions used for the results: envs/lock/<env>.yaml instead)
 
 # 3. GitHub-only packages, pinned to exact commits
 $M run -n dbl-r Rscript envs/install_r_github.R    # DoubletFinder, Chord
@@ -137,12 +138,15 @@ Note: scDblFinder also uses xgboost, and its scores changed slightly between xgb
 
 ```
 config/config.yaml   tools, interpreters, datasets, seeds, rate multipliers
-envs/                conda env files + pinned GitHub installs
+envs/                conda env files + pinned GitHub installs; envs/lock/ = exact versions used
+analysis/            statistics and figures (run_all.sh rebuilds everything)
+report/              report draft (report.md) and every number behind it (data.md)
 methods/             one wrapper per tool; common.py / common.R hold the shared I/O
-scripts/             download_data.sh, convert_rds.R, evaluate.py
+scripts/             download_data.sh, convert_rds.R, evaluate.py, subsample.py
 workflow/Snakefile   the pipeline
 docs/                proposal, usability log (metric 10)
-data/, results/, logs/   generated, not tracked in git
+results/             metrics.tsv, stats/, figures/, bench/ are tracked; pred/ and eval/ are not
+data/, logs/         generated, not tracked in git
 ```
 
 ## Adding a tool
@@ -155,16 +159,18 @@ data/, results/, logs/   generated, not tracked in git
    tool should reach AUROC above 0.98).
 4. Record install and run problems in `docs/usability_log.md`.
 
-## Status (2026-11-04)
+## Status (2026-11-11)
 
 - [x] Environments, data download and conversion (all 16 datasets)
 - [x] Wrappers for all 13 methods; smoke test passes on `J293t-dm`, `hm-6k`, `pbmc-1A-dm`
 - [x] Full run on all 16 datasets (208/208 ok)
 - [x] Rate robustness (0.5×/2×): `analysis/robustness.py`; DoubletFinder pK sensitivity
 - [x] Scaling with droplet number: `scripts/subsample.py`, `analysis/scaling.py`
-- [ ] Tool agreement
+- [x] Tool agreement, rate estimation, usability scores, statistics: `analysis/run_all.sh`
 - [ ] Independent doublet simulation from labeled singlets
-- [ ] Statistics (Friedman + Wilcoxon/Holm, Cliff's δ), figures, report
+- [x] Statistics (Friedman + Wilcoxon/Holm, Cliff's δ), figures
+- [ ] Report: draft in [`report/report.md`](report/report.md), all numbers in [`report/data.md`](report/data.md)
+- [ ] Stability across seeds; downstream analysis
 
 ## References
 

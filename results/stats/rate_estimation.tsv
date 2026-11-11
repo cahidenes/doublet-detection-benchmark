@@ -1,0 +1,11 @@
+tool	rate_input	median_error	mean_abs_error	median_ratio_est_true	spearman_est_true	within_25pct
+chord	supplied	0.0000	0.0000	1.0000	1.0000	1.0000
+doubletfinder	supplied	0.0000	0.0000	1.0000	1.0000	1.0000
+scdblfinder	supplied	0.0105	0.0526	1.0858	0.7000	0.2500
+scrublet	supplied	-0.0454	0.0811	0.2321	0.5176	0.1875
+vaeda	self-estimated	-0.0009	0.0544	0.9552	0.6471	0.3750
+bcds	self-estimated	0.0084	0.0546	1.0958	0.7118	0.3125
+hybrid	self-estimated	0.0183	0.0584	1.1580	0.7265	0.3125
+cxds	self-estimated	0.0271	0.0630	1.2473	0.7471	0.3125
+doubletdetection	self-estimated	-0.0180	0.0706	0.6924	0.2971	0.1875
+solo	self-estimated	0.0742	0.1338	1.8791	0.5794	0.0625

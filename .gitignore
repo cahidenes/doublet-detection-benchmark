@@ -17,3 +17,4 @@ results/sensitivity/eval/
 !results/figures/
 !results/scaling_metrics.tsv
 !results/scaling_summary.tsv
+!results/stats/

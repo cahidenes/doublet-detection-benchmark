@@ -31,6 +31,16 @@ Three practical findings stand out:
 2. Chord and bcds/hybrid only run with compatibility fixes.
 3. Tools that call exactly the user-supplied number of doublets inherit any error in that number.
 
+Three further analyses support these results:
+- **Simulated doublets.** On synthetic doublets of known composition, the ranking matches the
+  real-data ranking (rank correlation 0.93). The kNN-based methods fail on homotypic doublets.
+  No method detects homotypic doublets at singlet depth.
+- **Random seeds.** With three seeds, the top five methods keep their ranks. Run-to-run AUPRC
+  spread (median SD ≤ 0.013) is far smaller than the differences between them.
+- **Downstream analysis.** Removing scDblFinder's calls eliminates all 22 doublet-driven
+  clusters. Solo and DoubletFinder remove many singlets and make HVG selection worse than not
+  removing anything.
+
 ## 1. Introduction
 
 A doublet looks like a single cell with an unusual, mixed expression profile. It can show up as a
@@ -303,6 +313,110 @@ The main ranking keeps the default procedure, since choosing pK with the labels 
 on the test set. A label-free rule such as "always use a small pK" is a promising hypothesis to
 test on independent data.
 
+### 3.8 Simulated doublets: what makes a doublet hard
+
+![Simulation](../results/figures/simulation.png)
+
+*Figure 7. AUPRC on synthetic doublets made from labeled singlets. Two base datasets
+(pbmc-2ctrl-dm, pdx-MULTI), 3 pairings and 2 depths; doublet rate 0.10, which is also the
+chance level.*
+
+We made synthetic doublets from labeled singlets with our own procedure
+(`scripts/simulate_doublets.py`):
+- cell types come from Leiden clustering of the singlets;
+- the two parents are removed from the data, so neither also appears as a singlet;
+- the doublet's counts are either the parents' sum (f = 1) or that sum binomially downsampled
+  to singlet depth (f = 0.5).
+
+**The simulation reproduces the real-data ranking.** The rank correlation between each
+method's mean AUPRC on real and on simulated data is 0.93. On the natural mix (random pairing,
+summed library), scDblFinder (0.68) and vaeda (0.66) lead, as on real data.
+
+**Homotypic doublets separate the methods by mechanism.** When both parents come from the same
+cluster, the kNN- and density-based methods collapse:
+
+| Method | Random pairing | Homotypic |
+|---|--:|--:|
+| Scrublet | 0.42 | 0.14 |
+| DoubletFinder | 0.45 | 0.17 |
+| DoubletDensity | 0.60 | 0.27 |
+| scDblFinder | 0.68 | 0.41 |
+
+Methods that also use sequencing depth hold up best: Solo 0.53, bcds 0.49, hybrid 0.46 and
+DoubletDetection 0.44. Even the library-size baselines reach 0.38–0.39 here, because a
+homotypic doublet differs from a singlet mainly by its extra RNA.
+
+**At singlet-like depth, most of the signal is gone.** With f = 0.5, the best method reaches
+0.38 (DoubletDensity), followed by Scrublet (0.33). Solo, bcds and hybrid fall to about 0.16:
+their classifiers rely heavily on library size. Homotypic doublets at singlet depth are at
+chance level (0.10–0.13) for every method. Such doublets carry neither an expression nor a
+depth signal and are undetectable by design.
+
+Two caveats:
+- **The simulation is additive**, like most tools' internal simulations, so it is independent of
+  the tools only in implementation, not in its generative assumption.
+- **The heterotypic scenario** chooses the partner's cluster uniformly, which over-represents
+  rare cell types compared with random pairing. This is probably why "heterotypic" is not
+  easier than "random" for most methods. **[TODO: confirm with abundance-weighted heterotypic
+  pairing.]**
+
+### 3.9 Stability across seeds
+
+![Stability](../results/figures/stability.png)
+
+*Figure 8. Spread across three random seeds (0, 1, 2) for the 10 methods with randomness, 16 real
+datasets, labeled rate. Left: AUPRC standard deviation; right: mean pairwise Jaccard of the
+default calls.*
+
+We reran every method that uses random numbers with seeds 1 and 2 (320 runs; cxds and the
+baselines are deterministic). Details are in [data.md §14](data.md#14-stability-across-seeds).
+
+- **The ranking is stable.** scDblFinder, vaeda, DoubletDensity, DoubletDetection and hybrid
+  hold ranks 1–5 under every seed. Below them, the mean AUPRCs of Solo, bcds, Scrublet, cxds and
+  Chord lie within 0.02 of each other, and their order changes between seeds. Chord moves from
+  10th (seed 0) to 8th. The statistical conclusions in §3.1 do not depend on the seed.
+- **AUPRC varies little.** The median SD per dataset is 0.002 (Scrublet) to 0.013 (Chord). The
+  largest single spreads are Solo on hm-6k (range 0.12) and Chord on HEK-HMEC-MULTI (0.08).
+- **The called droplets vary much more than AUPRC.** The median Jaccard overlap of calls
+  between seeds is 0.86 (Chord), 0.84 (DoubletDetection), 0.81 (Scrublet) and 0.79
+  (scDblFinder, vaeda). It is lower for Solo (0.67), hybrid (0.65) and bcds (0.56): with
+  bcds, about half of the doublets called under one seed are not called under another.
+  For Scrublet and vaeda, single datasets go down to 0.17 and 0.23. This is probably because Scrublet's
+  automatic threshold falls on different sides of a valley in the score distribution under
+  different seeds.
+  A single run's calls should not be treated as definitive.
+- **DoubletFinder is identical across seeds.** Seurat's `RunPCA` resets the R random seed to
+  42 internally, which overrides the wrapper's seed before DoubletFinder draws its
+  artificial doublets. Its variance under real reseeding is therefore not measured here.
+
+One Chord run (pdx-MULTI, seed 1) first failed with a transient error. Its parallel
+backend could not open a local socket port. It succeeded unchanged on a rerun.
+
+### 3.10 Downstream impact of doublet removal
+
+![Downstream](../results/figures/downstream.png)
+
+*Figure 9. Downstream analysis after removing each tool's calls, compared with the oracle
+(labeled doublets removed). 16 real datasets.*
+
+For every dataset we removed each tool's calls and ran a standard scanpy analysis (2,000 HVGs,
+PCA, Leiden), then compared it with the same analysis after removing exactly the labeled
+doublets ([data.md §15](data.md#15-downstream-impact)).
+
+- **Spurious doublet clusters.** Without any removal, the 16 datasets contain 22 clusters
+  made up mostly of doublets. After scDblFinder none remain; vaeda leaves 1, and Solo and
+  DoubletDensity 2. DoubletFinder (10) and the baselines (10–12) leave about half.
+- **HVGs and markers.** The best tools raise HVG overlap with the oracle from 0.835 (no
+  removal) to 0.87 (DoubletDensity, DoubletDetection, vaeda, scDblFinder). DoubletFinder
+  (0.79), Solo (0.77) and cxds (0.80) do *worse than removing nothing*. Solo over-calls and
+  removes the most singlets (median 774 per dataset). DoubletFinder removes as many droplets
+  as the oracle, but about 60% of them are singlets. Marker-gene overlap shows the same pattern in a narrower range (0.74–0.82, against
+  0.80 for no removal).
+- **Clustering ARI is not informative.** Re-clustering the oracle data with another seed already
+  gives only ARI 0.75, so Leiden's own variability is as large as any tool's effect.
+- **Trajectory inference** was not evaluated: none of the 16 datasets has a ground-truth
+  trajectory.
+
 ## 4. Discussion
 
 **Recommendation.** For routine use, scDblFinder is the best overall choice: top accuracy,
@@ -321,9 +435,11 @@ DoubletFinder is consistent with the pK sensitivity above, and possibly with cha
 v5 preprocessing.
 
 **Limitations.**
-- **One seed.** Stability across seeds (a stretch goal) has not been measured, so small
-  differences between stochastic tools (Solo, vaeda, DoubletDetection, scDblFinder) may not
-  be robust.
+- **Three seeds.** The ranking of the top five is stable across three seeds (§3.9), but
+  three seeds is enough to show the spread, not to estimate it precisely. DoubletFinder's
+  seed has no effect, because Seurat resets the random seed.
+- **Simulation is additive** and uses two base datasets (§3.8). **Downstream** uses one
+  standard pipeline and no trajectory or DE ground truth (§3.10).
 - **Defaults only.** Tuned settings could change the ranking, as DoubletFinder's pK shows.
 - **No homotypic adjustment** for DoubletFinder, and Solo with default early stopping.
 - **The labels are imperfect.** Hashing and demuxlet cannot detect doublets of the same sample
@@ -364,16 +480,24 @@ $SMK --cores 4 --keep-going --config "datasets=[${DS%,}]" 'rate_multipliers=[1.0
 # 5. DoubletFinder pK sensitivity (~1 h)
 analysis/df_pk_sensitivity.sh
 
-# 6. All statistics, figures and report/data.md
+# 6. Stretch goals: 12 simulated datasets, then seeds 1-2 (~1 h + ~4.5 h)
+for b in pbmc-2ctrl-dm pdx-MULTI; do
+  ~/miniforge3/envs/dbl-py/bin/python scripts/simulate_doublets.py "$b"
+done
+scripts/run_stretch.sh            # -> results/sim_metrics.tsv, results/stability_metrics.tsv
+
+# 7. All statistics, figures and report/data.md (downstream.py alone takes ~10 min)
 analysis/run_all.sh
 ```
 
 Additional notes:
 - **Seeds and settings** are in `config/config.yaml`: seed 0, rate multipliers 0.5/1/2.
-- **Committed results:** `results/metrics.tsv`, `results/scaling_metrics.tsv`, `results/stats/`,
-  `results/bench/`, `results/figures/`. Steps 3–5 can be skipped to re-analyse the committed
-  results, except `analysis/agreement.py`, which needs the per-droplet predictions
-  (`results/pred/`, 336 MB, not in git).
+- **Committed results:** `results/metrics.tsv`, `results/scaling_metrics.tsv`,
+  `results/sim_metrics.tsv`, `results/stability_metrics.tsv`, `results/downstream_metrics.tsv`,
+  `results/stats/`, `results/bench/`, `results/figures/`. Steps 3–6 can be skipped to
+  re-analyse the committed results, except `analysis/agreement.py`, `stability.py` and
+  `downstream.py`, which need the per-droplet predictions (`results/pred/`, not in git).
+  `downstream.py --plot-only` redraws its figure from the committed table.
 - **Expected differences on a rerun:** GPU methods (Solo, vaeda) are not bit-reproducible
   across hardware or CUDA versions. scDblFinder depends on the xgboost version (pinned to
   2.1.4).
@@ -381,20 +505,21 @@ Additional notes:
 
 ## 6. Further work
 
-1. **Stability across seeds.** Rerun the stochastic methods with 5 seeds and report the spread
-   of AUPRC and of the default calls. This is about 7 h of compute per seed for the main run.
-2. **Independent simulation.** Build synthetic doublets from labeled singlets with a
-   procedure that differs from every tool's internal simulation, so that methods are not scored
-   on their own generative assumptions. Vary heterotypic vs homotypic fraction and library-size
-   ratio.
-3. **Downstream impact.** Measure how removing each tool's calls changes DE (false positives
-   between clusters), HVG selection, clustering (ARI against hashing labels) and trajectory
-   inference, as in Xi & Li.
+1. **More seeds, with real reseeding of DoubletFinder.** Use 5–10 seeds to estimate the spread
+   of the default calls precisely. For DoubletFinder, pass the seed through Seurat's `seed.use`.
+2. **Refine the simulation.** Pick heterotypic partners in proportion to cluster abundance
+   (§3.8 TODO). Add more base datasets and intermediate depth ratios. Add a non-additive
+   doublet model, for example with capture-efficiency noise.
+3. **Downstream with ground truth.** Measure false-positive DE genes between clusters, using
+   hashing labels to define the true clusters. Measure trajectory inference on a dataset with a
+   known trajectory, as in Xi & Li.
 4. **Label-free pK rule for DoubletFinder.** Test "small fixed pK" against BCmvn on the
    simulations, which do not share labels with this benchmark.
 5. **Simple ensembles.** The gap between the best single method and the oracle union (57% vs
    74% recall) suggests rank averaging of 2–3 diverse methods (e.g. scDblFinder + vaeda +
    DoubletDetection). Evaluate this with leave-one-dataset-out to avoid optimistic selection.
+   The low call overlap between seeds (§3.9) suggests that averaging seeds within one tool
+   may also help.
 6. **Newer data and tools.** Add recent multiplexed datasets (10x Flex, OCM), single-nucleus
    and ATAC data (scDblFinder, AMULET), and newer tools as they appear. The pipeline needs one
    wrapper and one config line per tool.

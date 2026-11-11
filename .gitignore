@@ -18,3 +18,6 @@ results/sensitivity/eval/
 !results/scaling_metrics.tsv
 !results/scaling_summary.tsv
 !results/stats/
+!results/sim_metrics.tsv
+!results/stability_metrics.tsv
+!results/downstream_metrics.tsv

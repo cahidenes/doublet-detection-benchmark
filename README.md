@@ -142,10 +142,12 @@ envs/                conda env files + pinned GitHub installs; envs/lock/ = exac
 analysis/            statistics and figures (run_all.sh rebuilds everything)
 report/              report draft (report.md) and every number behind it (data.md)
 methods/             one wrapper per tool; common.py / common.R hold the shared I/O
-scripts/             download_data.sh, convert_rds.R, evaluate.py, subsample.py
+scripts/             download_data.sh, convert_rds.R, evaluate.py, subsample.py,
+                     simulate_doublets.py, run_stretch.sh (simulation + seed runs)
 workflow/Snakefile   the pipeline
 docs/                proposal, usability log (metric 10)
-results/             metrics.tsv, stats/, figures/, bench/ are tracked; pred/ and eval/ are not
+results/             metrics.tsv, {scaling,sim,stability,downstream}_metrics.tsv, stats/,
+                     figures/, bench/ are tracked; pred/ and eval/ are not
 data/, logs/         generated, not tracked in git
 ```
 
@@ -167,10 +169,12 @@ data/, logs/         generated, not tracked in git
 - [x] Rate robustness (0.5×/2×): `analysis/robustness.py`; DoubletFinder pK sensitivity
 - [x] Scaling with droplet number: `scripts/subsample.py`, `analysis/scaling.py`
 - [x] Tool agreement, rate estimation, usability scores, statistics: `analysis/run_all.sh`
-- [ ] Independent doublet simulation from labeled singlets
+- [x] Independent doublet simulation from labeled singlets: `scripts/simulate_doublets.py`,
+      `analysis/simulation.py` (12 datasets, 156/156 ok)
 - [x] Statistics (Friedman + Wilcoxon/Holm, Cliff's δ), figures
 - [ ] Report: draft in [`report/report.md`](report/report.md), all numbers in [`report/data.md`](report/data.md)
-- [ ] Stability across seeds; downstream analysis
+- [x] Stability across seeds 0–2 (320/320 ok): `analysis/stability.py`
+- [x] Downstream impact (HVGs, markers, clusters): `analysis/downstream.py`
 
 ## References
 

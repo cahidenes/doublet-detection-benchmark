@@ -50,7 +50,9 @@ out = ["# Report data",
        "7. [Rate robustness](#7-rate-robustness) · 8. [Runtime and memory](#8-runtime-and-memory) · "
        "9. [Scaling](#9-scaling) · 10. [Agreement](#10-agreement) · "
        "11. [Statistics](#11-statistics) · 12. [DoubletFinder pK](#12-doubletfinder-pk-sensitivity) · "
-       "13. [Failed runs](#13-failed-runs) · 14. [Raw files](#14-raw-files)", ""]
+       "13. [Simulated doublets](#13-simulated-doublets) · 14. [Stability](#14-stability-across-seeds) · "
+       "15. [Downstream](#15-downstream-impact) · 16. [Failed runs](#16-failed-runs) · "
+       "17. [Raw files](#17-raw-files)", ""]
 
 # 1 datasets
 ds = d.groupby("dataset").agg(droplets=("n", "first"), rate=("true_rate", "first")).loc[DS]
@@ -185,22 +187,69 @@ out += ["## 12. DoubletFinder pK sensitivity",
         "(BCmvn), which picked 0.005 (pbmc-1C-dm), 0.13 (pbmc-2stim-dm) and 0.3 (pbmc-ch).", "",
         md(pd.concat([pk, pd.DataFrame([auto[pk.columns]], index=["automatic"])])), ""]
 
+# 13-15 stretch goals
+sim = pd.read_csv(STATS / "simulation_auprc.tsv", sep="\t", index_col=0)
+sim.index = [NAMES[t] for t in sim.index]; sim.index.name = "tool"
+simb = pd.read_csv(STATS / "simulation_auprc_by_base.tsv", sep="\t", header=[0, 1], index_col=0)
+simb.index = [NAMES[t] for t in simb.index]; simb.index.name = "tool"
+simb.columns = [f"{a} / {b}" for a, b in simb.columns]
+out += ["## 13. Simulated doublets",
+        "",
+        "Synthetic doublets from labeled singlets (`scripts/simulate_doublets.py`). Each dataset "
+        "has 5,455 droplets, 545 doublets (rate 0.10 = chance-level AUPRC), 2 base datasets × "
+        "3 pairings × 2 depths. `f=1` sums the two parents' counts; `f=0.5` binomially "
+        "downsamples the sum to singlet depth. The values below are AUPRC, averaged over the two "
+        "base datasets.", "", md(sim), "", "### Per base dataset", "", md(simb), ""]
+if (STATS / "stability.tsv").exists():
+    stb = pd.read_csv(STATS / "stability.tsv", sep="\t")
+    sm = stb.groupby("tool")[["auprc_sd", "auprc_range", "f1_sd", "call_jaccard"]].median()
+    sm = sm.sort_values("auprc_sd"); sm.index = [NAMES[t] for t in sm.index]; sm.index.name = "tool"
+    sr = pd.read_csv(STATS / "stability_ranks.tsv", sep="\t", index_col=0)
+    sr.index = [NAMES[t] for t in sr.index]; sr.index.name = "tool"
+    out += ["## 14. Stability across seeds",
+            "",
+            "Seeds 0, 1 and 2, with each tool at its defaults and the labeled rate. Medians over "
+            "16 datasets of the per-dataset spread. `call_jaccard` is the overlap of called "
+            "droplets between seeds (1 = identical). cxds and the baselines are deterministic "
+            "and not listed.", "", md(sm, "{:.4f}"), "",
+            "### Mean AUPRC and rank per seed", "",
+            "For the deterministic methods, the seed-0 value is repeated.", "",
+            md(sr), "", "### Per tool and dataset", "",
+            md(stb.assign(tool=stb.tool.map(NAMES)), "{:.4f}", index=False), ""]
+dsm = pd.read_csv(R / "downstream_metrics.tsv", sep="\t")
+REFN = {**NAMES, "none": "(no removal)", "reseed": "(oracle, other seed)"}
+dss = pd.read_csv(STATS / "downstream_summary.tsv", sep="\t", index_col=0)
+dss = dss.loc[["reseed", "none"] + [t for t in ORDER if t in dss.index]]
+dss.index = [REFN[t] for t in dss.index]; dss.index.name = "tool"
+out += ["## 15. Downstream impact",
+        "",
+        "Each tool's calls are removed (for score-only methods, the top labeled-rate × n "
+        "droplets), then a standard scanpy analysis is run on what remains: 2,000 HVGs, PCA 30, "
+        "Leiden at resolution 1. Results are compared with the oracle, which removes exactly the "
+        "labeled doublets. `doublet_clusters` counts clusters (≥ 20 droplets) made of ≥ 50% "
+        "labeled doublets. Values are medians over datasets; `doublet_clusters_total` is the "
+        "sum over datasets.", "", md(dss), "", "### Per dataset", "",
+        md(dsm.assign(tool=dsm.tool.map(REFN))[["dataset", "tool", "ari", "hvg_jaccard",
+            "marker_jaccard", "doublet_clusters", "n_clusters", "n_removed", "residual_doublets",
+            "singlets_removed"]].sort_values(["dataset", "tool"]), "{:.3f}", index=False), ""]
+
 # 13 failures
-allm = pd.concat([pd.read_csv(R / "metrics.tsv", sep="\t"), pd.read_csv(R / "scaling_metrics.tsv", sep="\t")])
+allm = pd.concat([pd.read_csv(R / f, sep="\t") for f in ("metrics.tsv", "scaling_metrics.tsv", "sim_metrics.tsv", "stability_metrics.tsv") if (R / f).exists()])
 fail = allm[allm.status != "ok"][["tool", "dataset", "rate_mult", "error"]]
 fail["error"] = fail.error.str.replace("|", "/", regex=False).str.slice(0, 140)
 n_total = len(allm)
-out += ["## 13. Failed runs", "",
-        f"{len(fail)} of {n_total} runs failed (main run, robustness and scaling together). "
+out += ["## 16. Failed runs", "",
+        f"{len(fail)} of {n_total} runs failed (main run, robustness, scaling, simulation and stability together). "
         "The `error` column is the last lines of the log. For both Chord failures, the actual "
         "error is earlier in the log: `overkillDB2 -> sample(): cannot take a sample larger than "
         "the population when 'replace = FALSE'` (2× the labeled rate is 0.62 and 0.75).", "",
         md(fail, "{:g}", index=False) if len(fail) else "None.", ""]
 
 # 14 raw
-out += ["## 14. Raw files", "", "| file | content |", "|---|---|",
+out += ["## 17. Raw files", "", "| file | content |", "|---|---|",
         "| `results/metrics.tsv` | One row per run (tool × dataset × rate multiplier): every accuracy metric, wall time, peak memory and status |",
-        "| `results/scaling_metrics.tsv` | The same, for the scaling subsamples |",
+        "| `results/scaling_metrics.tsv`, `sim_metrics.tsv`, `stability_metrics.tsv` | The same, for the scaling subsamples, the simulated datasets and seeds 1–2 |",
+        "| `results/downstream_metrics.tsv` | Downstream-impact metrics per dataset and tool |",
         "| `results/bench/<tool>/<ds>/*.tsv` | Raw Snakemake benchmark output (time, RSS, CPU) |",
         "| `results/stats/*.tsv` | Ranks, Friedman test, pairwise tests, agreement, rate estimation |",
         "| `results/robustness_summary.tsv`, `results/scaling_summary.tsv` | Summary tables for sections 7 and 9 |",

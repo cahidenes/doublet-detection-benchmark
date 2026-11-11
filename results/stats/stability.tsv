@@ -1,0 +1,161 @@
+tool	dataset	n_seeds	auprc_mean	auprc_sd	auprc_range	f1_sd	call_jaccard
+bcds	HEK-HMEC-MULTI	3	0.3335	0.0095	0.0173	0.0082	0.5611
+bcds	HMEC-orig-MULTI	3	0.3813	0.0058	0.0115	0.0109	0.4431
+bcds	HMEC-rep-MULTI	3	0.5776	0.0028	0.0048	0.0074	0.5892
+bcds	J293t-dm	3	0.1064	0.0087	0.0167	0.0243	0.4317
+bcds	cline-ch	3	0.3972	0.0051	0.0093	0.0080	0.4503
+bcds	hm-12k	3	0.6231	0.0062	0.0120	0.0057	0.6293
+bcds	hm-6k	3	0.6681	0.0192	0.0343	0.0120	0.6062
+bcds	mkidney-ch	3	0.6140	0.0044	0.0079	0.0078	0.5756
+bcds	nuc-MULTI	3	0.3655	0.0100	0.0200	0.0052	0.5312
+bcds	pbmc-1A-dm	3	0.4235	0.0175	0.0349	0.0092	0.5308
+bcds	pbmc-1B-dm	3	0.2949	0.0405	0.0800	0.0213	0.5282
+bcds	pbmc-1C-dm	3	0.4517	0.0212	0.0413	0.0072	0.5684
+bcds	pbmc-2ctrl-dm	3	0.6218	0.0124	0.0221	0.0032	0.7225
+bcds	pbmc-2stim-dm	3	0.6369	0.0126	0.0240	0.0020	0.7235
+bcds	pbmc-ch	3	0.5837	0.0017	0.0034	0.0079	0.6283
+bcds	pdx-MULTI	3	0.4117	0.0083	0.0164	0.0020	0.5072
+chord	HEK-HMEC-MULTI	3	0.4563	0.0477	0.0828	0.0703	0.5620
+chord	HMEC-orig-MULTI	3	0.3993	0.0139	0.0253	0.0008	0.8774
+chord	HMEC-rep-MULTI	3	0.4931	0.0147	0.0293	0.0023	0.8729
+chord	J293t-dm	3	0.1292	0.0258	0.0500	0.0000	0.7162
+chord	cline-ch	3	0.3865	0.0088	0.0173	0.0035	0.7220
+chord	hm-12k	3	0.9995	0.0008	0.0014	0.0024	0.9945
+chord	hm-6k	3	1.0000	0.0000	0.0000	0.0000	1.0000
+chord	mkidney-ch	3	0.5735	0.0138	0.0244	0.0211	0.6552
+chord	nuc-MULTI	3	0.3960	0.0040	0.0078	0.0088	0.8892
+chord	pbmc-1A-dm	3	0.3752	0.0179	0.0359	0.0220	0.8865
+chord	pbmc-1B-dm	3	0.2278	0.0024	0.0046	0.0089	0.8538
+chord	pbmc-1C-dm	3	0.3905	0.0092	0.0170	0.0084	0.8829
+chord	pbmc-2ctrl-dm	3	0.4071	0.0223	0.0409	0.0062	0.9529
+chord	pbmc-2stim-dm	3	0.3054	0.0126	0.0251	0.0294	0.6870
+chord	pbmc-ch	3	0.5035	0.0339	0.0597	0.0171	0.7039
+chord	pdx-MULTI	3	0.3211	0.0088	0.0168	0.0368	0.7143
+dbldensity	HEK-HMEC-MULTI	3	0.4726	0.0018	0.0032		
+dbldensity	HMEC-orig-MULTI	3	0.4843	0.0016	0.0033		
+dbldensity	HMEC-rep-MULTI	3	0.5860	0.0012	0.0021		
+dbldensity	J293t-dm	3	0.2182	0.0007	0.0013		
+dbldensity	cline-ch	3	0.4071	0.0014	0.0026		
+dbldensity	hm-12k	3	0.9332	0.0048	0.0089		
+dbldensity	hm-6k	3	0.9943	0.0004	0.0008		
+dbldensity	mkidney-ch	3	0.6083	0.0022	0.0042		
+dbldensity	nuc-MULTI	3	0.4315	0.0034	0.0068		
+dbldensity	pbmc-1A-dm	3	0.3667	0.0073	0.0127		
+dbldensity	pbmc-1B-dm	3	0.3106	0.0033	0.0061		
+dbldensity	pbmc-1C-dm	3	0.4634	0.0023	0.0042		
+dbldensity	pbmc-2ctrl-dm	3	0.6758	0.0032	0.0063		
+dbldensity	pbmc-2stim-dm	3	0.6452	0.0031	0.0061		
+dbldensity	pbmc-ch	3	0.5714	0.0011	0.0022		
+dbldensity	pdx-MULTI	3	0.3971	0.0044	0.0078		
+doubletdetection	HEK-HMEC-MULTI	3	0.4544	0.0021	0.0039	0.0147	0.8018
+doubletdetection	HMEC-orig-MULTI	3	0.5009	0.0027	0.0053	0.0073	0.8558
+doubletdetection	HMEC-rep-MULTI	3	0.5747	0.0047	0.0091	0.0134	0.6399
+doubletdetection	J293t-dm	3	0.2174	0.0032	0.0057	0.0234	0.8333
+doubletdetection	cline-ch	3	0.3947	0.0013	0.0026	0.0042	0.9210
+doubletdetection	hm-12k	3	0.9996	0.0007	0.0013	0.0096	0.8960
+doubletdetection	hm-6k	3	0.9996	0.0007	0.0011	0.0585	0.7742
+doubletdetection	mkidney-ch	3	0.5538	0.0031	0.0060	0.0070	0.8732
+doubletdetection	nuc-MULTI	3	0.3815	0.0047	0.0091	0.0191	0.4845
+doubletdetection	pbmc-1A-dm	3	0.4213	0.0011	0.0021	0.0131	0.8926
+doubletdetection	pbmc-1B-dm	3	0.3309	0.0222	0.0394	0.0681	0.3926
+doubletdetection	pbmc-1C-dm	3	0.4666	0.0061	0.0118	0.0116	0.8547
+doubletdetection	pbmc-2ctrl-dm	3	0.6056	0.0032	0.0055	0.0037	0.8676
+doubletdetection	pbmc-2stim-dm	3	0.6062	0.0059	0.0113	0.0030	0.8716
+doubletdetection	pbmc-ch	3	0.6224	0.0059	0.0110	0.0125	0.7650
+doubletdetection	pdx-MULTI	3	0.3664	0.0056	0.0108	0.0116	0.7646
+doubletfinder	HEK-HMEC-MULTI	3	0.4465	0.0000	0.0000	0.0000	1.0000
+doubletfinder	HMEC-orig-MULTI	3	0.3816	0.0000	0.0000	0.0000	1.0000
+doubletfinder	HMEC-rep-MULTI	3	0.5743	0.0000	0.0000	0.0000	1.0000
+doubletfinder	J293t-dm	3	0.2350	0.0000	0.0000	0.0000	1.0000
+doubletfinder	cline-ch	3	0.3793	0.0000	0.0000	0.0000	1.0000
+doubletfinder	hm-12k	3	0.9927	0.0000	0.0000	0.0000	1.0000
+doubletfinder	hm-6k	3	0.9854	0.0000	0.0000	0.0000	1.0000
+doubletfinder	mkidney-ch	3	0.4104	0.0000	0.0000	0.0000	1.0000
+doubletfinder	nuc-MULTI	3	0.2787	0.0000	0.0000	0.0000	1.0000
+doubletfinder	pbmc-1A-dm	3	0.3321	0.0000	0.0000	0.0000	1.0000
+doubletfinder	pbmc-1B-dm	3	0.1906	0.0000	0.0000	0.0000	1.0000
+doubletfinder	pbmc-1C-dm	3	0.3951	0.0000	0.0000	0.0000	1.0000
+doubletfinder	pbmc-2ctrl-dm	3	0.3446	0.0000	0.0000	0.0000	1.0000
+doubletfinder	pbmc-2stim-dm	3	0.2610	0.0000	0.0000	0.0000	1.0000
+doubletfinder	pbmc-ch	3	0.2942	0.0000	0.0000	0.0000	1.0000
+doubletfinder	pdx-MULTI	3	0.2299	0.0000	0.0000	0.0000	1.0000
+hybrid	HEK-HMEC-MULTI	3	0.4682	0.0056	0.0108	0.0090	0.6472
+hybrid	HMEC-orig-MULTI	3	0.4306	0.0052	0.0093	0.0036	0.6010
+hybrid	HMEC-rep-MULTI	3	0.5892	0.0019	0.0037	0.0051	0.6427
+hybrid	J293t-dm	3	0.1640	0.0157	0.0307	0.0163	0.5405
+hybrid	cline-ch	3	0.3904	0.0035	0.0068	0.0027	0.5223
+hybrid	hm-12k	3	0.9557	0.0041	0.0081	0.0018	0.7872
+hybrid	hm-6k	3	0.9915	0.0003	0.0005	0.0302	0.6845
+hybrid	mkidney-ch	3	0.6065	0.0006	0.0012	0.0038	0.7011
+hybrid	nuc-MULTI	3	0.3764	0.0070	0.0135	0.0092	0.5989
+hybrid	pbmc-1A-dm	3	0.3922	0.0206	0.0408	0.0428	0.5472
+hybrid	pbmc-1B-dm	3	0.2434	0.0020	0.0037	0.0083	0.5967
+hybrid	pbmc-1C-dm	3	0.4246	0.0066	0.0119	0.0077	0.6334
+hybrid	pbmc-2ctrl-dm	3	0.5896	0.0032	0.0061	0.0041	0.7573
+hybrid	pbmc-2stim-dm	3	0.6006	0.0091	0.0182	0.0057	0.7625
+hybrid	pbmc-ch	3	0.6136	0.0037	0.0071	0.0043	0.7117
+hybrid	pdx-MULTI	3	0.3722	0.0035	0.0068	0.0015	0.6633
+scdblfinder	HEK-HMEC-MULTI	3	0.4624	0.0067	0.0131	0.0140	0.8331
+scdblfinder	HMEC-orig-MULTI	3	0.4837	0.0034	0.0067	0.0034	0.8218
+scdblfinder	HMEC-rep-MULTI	3	0.5936	0.0017	0.0033	0.0018	0.8017
+scdblfinder	J293t-dm	3	0.1854	0.0243	0.0484	0.0155	0.6118
+scdblfinder	cline-ch	3	0.4252	0.0030	0.0055	0.0044	0.6489
+scdblfinder	hm-12k	3	0.9322	0.0085	0.0154	0.0129	0.8705
+scdblfinder	hm-6k	3	0.9263	0.0154	0.0289	0.0371	0.7443
+scdblfinder	mkidney-ch	3	0.6052	0.0017	0.0034	0.0014	0.8385
+scdblfinder	nuc-MULTI	3	0.3976	0.0165	0.0293	0.0033	0.7718
+scdblfinder	pbmc-1A-dm	3	0.5442	0.0038	0.0074	0.0043	0.6904
+scdblfinder	pbmc-1B-dm	3	0.4107	0.0137	0.0238	0.0025	0.7087
+scdblfinder	pbmc-1C-dm	3	0.5704	0.0067	0.0128	0.0117	0.7211
+scdblfinder	pbmc-2ctrl-dm	3	0.6905	0.0013	0.0026	0.0013	0.9060
+scdblfinder	pbmc-2stim-dm	3	0.7029	0.0112	0.0220	0.0017	0.9083
+scdblfinder	pbmc-ch	3	0.6371	0.0045	0.0082	0.0020	0.8690
+scdblfinder	pdx-MULTI	3	0.4242	0.0047	0.0086	0.0064	0.7169
+scrublet	HEK-HMEC-MULTI	3	0.4666	0.0020	0.0040	0.0113	0.8577
+scrublet	HMEC-orig-MULTI	3	0.3973	0.0022	0.0041	0.0017	0.8916
+scrublet	HMEC-rep-MULTI	3	0.4911	0.0016	0.0029	0.0544	0.5903
+scrublet	J293t-dm	3	0.2454	0.0028	0.0054	0.0215	0.8889
+scrublet	cline-ch	3	0.3746	0.0014	0.0029	0.0053	0.9408
+scrublet	hm-12k	3	0.9215	0.0033	0.0066	0.0068	0.8663
+scrublet	hm-6k	3	0.9562	0.0039	0.0077	0.0082	0.9111
+scrublet	mkidney-ch	3	0.5450	0.0010	0.0017	0.0042	0.8748
+scrublet	nuc-MULTI	3	0.3488	0.0055	0.0109	0.0062	0.5711
+scrublet	pbmc-1A-dm	3	0.2470	0.0068	0.0136	0.0139	0.5090
+scrublet	pbmc-1B-dm	3	0.2166	0.0041	0.0077	0.0351	0.4977
+scrublet	pbmc-1C-dm	3	0.2969	0.0016	0.0029	0.0091	0.4583
+scrublet	pbmc-2ctrl-dm	3	0.5709	0.0020	0.0040	0.0181	0.7840
+scrublet	pbmc-2stim-dm	3	0.5511	0.0014	0.0026	0.0128	0.8449
+scrublet	pbmc-ch	3	0.5168	0.0006	0.0012	0.0008	0.7594
+scrublet	pdx-MULTI	3	0.2524	0.0014	0.0028	0.1692	0.1683
+solo	HEK-HMEC-MULTI	3	0.3062	0.0299	0.0551	0.0150	0.6429
+solo	HMEC-orig-MULTI	3	0.5064	0.0063	0.0114	0.0103	0.6760
+solo	HMEC-rep-MULTI	3	0.6188	0.0037	0.0070	0.0032	0.6708
+solo	J293t-dm	3	0.1159	0.0258	0.0509	0.0067	0.9595
+solo	cline-ch	3	0.4052	0.0047	0.0085	0.0065	0.5025
+solo	hm-12k	3	0.5522	0.0209	0.0404	0.0269	0.7808
+solo	hm-6k	3	0.5686	0.0672	0.1188	0.0097	0.6643
+solo	mkidney-ch	3	0.6270	0.0033	0.0062	0.0139	0.7373
+solo	nuc-MULTI	3	0.3284	0.0097	0.0193	0.0135	0.5983
+solo	pbmc-1A-dm	3	0.4015	0.0312	0.0546	0.0216	0.5226
+solo	pbmc-1B-dm	3	0.2178	0.0108	0.0215	0.0240	0.5513
+solo	pbmc-1C-dm	3	0.4756	0.0164	0.0322	0.0106	0.5996
+solo	pbmc-2ctrl-dm	3	0.6435	0.0064	0.0111	0.0170	0.7543
+solo	pbmc-2stim-dm	3	0.6336	0.0095	0.0172	0.0201	0.7311
+solo	pbmc-ch	3	0.6232	0.0050	0.0099	0.0081	0.7704
+solo	pdx-MULTI	3	0.4376	0.0034	0.0066	0.0066	0.6180
+vaeda	HEK-HMEC-MULTI	3	0.4888	0.0070	0.0138	0.0056	0.8266
+vaeda	HMEC-orig-MULTI	3	0.4994	0.0029	0.0053	0.0037	0.8323
+vaeda	HMEC-rep-MULTI	3	0.6057	0.0071	0.0125	0.0221	0.8037
+vaeda	J293t-dm	3	0.1948	0.0044	0.0077	0.0245	0.2333
+vaeda	cline-ch	3	0.4060	0.0005	0.0010	0.0028	0.7338
+vaeda	hm-12k	3	0.9069	0.0353	0.0629	0.0147	0.9215
+vaeda	hm-6k	3	0.9697	0.0233	0.0463	0.0306	0.7447
+vaeda	mkidney-ch	3	0.5815	0.0024	0.0047	0.0046	0.9181
+vaeda	nuc-MULTI	3	0.4250	0.0198	0.0349	0.0211	0.6747
+vaeda	pbmc-1A-dm	3	0.4634	0.0167	0.0318	0.0259	0.7434
+vaeda	pbmc-1B-dm	3	0.3885	0.0133	0.0257	0.0143	0.7138
+vaeda	pbmc-1C-dm	3	0.5273	0.0080	0.0160	0.0028	0.7651
+vaeda	pbmc-2ctrl-dm	3	0.6704	0.0002	0.0003	0.0015	0.9251
+vaeda	pbmc-2stim-dm	3	0.6424	0.0077	0.0143	0.0055	0.9199
+vaeda	pbmc-ch	3	0.6169	0.0013	0.0024	0.0023	0.8258
+vaeda	pdx-MULTI	3	0.4080	0.0112	0.0213	0.0181	0.7660

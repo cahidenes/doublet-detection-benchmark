@@ -176,6 +176,65 @@ data/, logs/         generated, not tracked in git
 - [x] Stability across seeds 0–2 (320/320 ok): `analysis/stability.py`
 - [x] Downstream impact (HVGs, markers, clusters): `analysis/downstream.py`
 
+## Open issues and next steps (review, 2026-11-17)
+
+### Fix first
+
+- [ ] **Independent validation of scDblFinder.** Its parameters were tuned on these 16
+      datasets, and both simulation bases (`pbmc-2ctrl-dm`, `pdx-MULTI`) are among them. Only
+      singletCode data is truly independent, which makes it the most important remaining task.
+      Until it is done, state this caveat in the abstract.
+- [ ] **Label noise is not tool-neutral.** Same-sample doublets (often homotypic) are labeled
+      singlets, and tools differ strongly on homotypic doublets (§3.8: Solo 0.53 vs Scrublet
+      0.14). Missing labels therefore penalize exactly the tools that find them. This probably
+      explains Solo's and bcds' low AUPRC on `hm-12k`/`hm-6k`, where human–human and
+      mouse–mouse doublets are labeled singlets. Test: do their top-scored "false positives"
+      have about 2× the library size of their own species? Revise the milestone 2 argument
+      accordingly.
+- [ ] **Per-dataset comparison with Xi & Li (2021).** They ranked DoubletFinder first on
+      AUPRC; here it is last among tools. Compare every tool's per-dataset AUPRC with their
+      table: each large gap is either a bug or a finding. Log the chosen pK on all 16
+      datasets and run the fixed-pK sweep on all 16, not 3.
+- [ ] **Realistic expected-rate setting.** The main run gives rate-taking tools the labeled
+      rate, which no user has. This favours scDblFinder, Scrublet, DoubletFinder and Chord in
+      the F1 comparison. Add a run with tool defaults (`dbr = NULL`, Scrublet 0.1) or the 10x
+      loading heuristic.
+- [ ] **Paired effect sizes.** Cliff's δ is computed unpaired over the 16 values, so dataset
+      difficulty swamps it (scDblFinder vs vaeda: δ = 0.04). Keep it as committed, but add a
+      paired effect size (matched-pairs rank-biserial, or median paired difference with a
+      bootstrap CI). Datasets are not independent (5 lupus PBMC, 3 HMEC, 2 species mixes):
+      add a sensitivity analysis that averages within study first.
+
+### Smaller fixes
+
+- [ ] Downstream: the reseed reference does not change HVGs, so HVG Jaccard (0.835 vs 0.87)
+      has no noise floor. Add a "remove k random droplets" reference.
+- [ ] Simulation: one draw per scenario at one rate, so there are no error bars. Add
+      replicates; estimate the real doublet/singlet library-size ratio from the labeled data
+      to say which `f` is realistic.
+- [ ] F1 statistics: DoubletDensity has no calls; drop it from the Friedman test on F1.
+- [ ] Milestone table: singletCode is ticked for dimensions 1–14 but has not run yet; "sel"
+      is hard to read.
+- [ ] References: Chord is *Communications Biology* 5, 510 (2022) in the proposal but
+      *Briefings in Bioinformatics* in `report.md`; check which is right. Cite and discuss
+      Zhang et al. (2024) in the report.
+- [ ] Reproducibility: `agreement.py`, `stability.py` and `downstream.py` need
+      `results/pred/`, which is not in git. Deposit it on Zenodo.
+- [ ] Be able to explain every compatibility shim, especially the xgboost one: bcds, hybrid
+      and Chord depend on it being correct.
+
+### Worth adding (in order of value for effort)
+
+1. **Simple ensemble.** Rank-average 2–3 top tools, evaluated leave-one-dataset-out. The
+   predictions already exist, and the 57% vs 74% recall gap (best single vs oracle union)
+   suggests room. Chord losing to its own components makes this a useful contrast.
+2. **Scaling to 100k–200k droplets.** 26k is small by current standards; timing needs no
+   labels, and out-of-memory failures are themselves a finding.
+3. **Lineage co-expression (dimension 15).** Note that it can only confirm heterotypic
+   doublets.
+4. **Label-free pK rule for DoubletFinder**, tested on singletCode data so it is not tuned
+   on the test set.
+
 ## References
 
 - Xi, N. M. & Li, J. J. Benchmarking computational doublet-detection methods for single-cell

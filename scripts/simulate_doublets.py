@@ -11,14 +11,19 @@ From one processed real dataset:
 
 Pairing scenarios:
   random        any two cells (the natural mix)
-  heterotypic   parents from different clusters
+  heterotypic   parents from different clusters; the partner's cluster is drawn uniformly
+                among the other clusters (over-represents rare cell types)
+  heteroweighted  parents from different clusters, partner drawn in proportion to cluster
+                abundance (= random pairing conditioned on different clusters)
   homotypic     parents from the same cluster (hard: the profile looks like one cell type)
 
 This is our own procedure, not any tool's, but like most tools it is additive (sum of two
 cells), so it is "independent" only in implementation, not in its generative assumption.
 
 Usage: python scripts/simulate_doublets.py <base_ds> [--n 6000] [--rate 0.1] [--seed 0]
-Writes data/processed/sim-<base>-<pairing>-f<f>/ for all 3 pairings x f in {1, 0.5}.
+                                          [--pairings random heterotypic homotypic heteroweighted]
+Writes data/processed/sim-<base>-<pairing>-f<f>[-r<seed>]/ for each pairing x f in {1, 0.5}.
+Seed 0 has no suffix; other seeds are independent replicate draws (singlets, pairs, depth).
 """
 import argparse
 import gzip
@@ -35,6 +40,7 @@ import scipy.sparse as sp
 p = argparse.ArgumentParser()
 p.add_argument("base"); p.add_argument("--n", type=int, default=6000)
 p.add_argument("--rate", type=float, default=0.1); p.add_argument("--seed", type=int, default=0)
+p.add_argument("--pairings", nargs="+", default=["random", "heterotypic", "homotypic", "heteroweighted"])
 a = p.parse_args()
 rng = np.random.default_rng(a.seed)
 
@@ -73,6 +79,11 @@ def draw_pairs(mode):
             continue
         if mode == "homotypic":
             cand = [j for j in by_cl[cl[i]] if avail[j] and j != i]
+        elif mode == "heteroweighted":
+            # any available cell outside i's cluster, uniformly over cells
+            cand = [j for j in order if avail[j] and cl[j] != cl[i]]
+            if cand:
+                cand = [cand[rng.integers(len(cand))]]
         else:
             # heterotypic: take the next available cell of a random other cluster
             others = [c for c in by_cl if c != cl[i] and any(avail[j] for j in by_cl[c])]
@@ -87,7 +98,7 @@ def draw_pairs(mode):
     p1, p2 = map(np.array, zip(*pairs)); return p1, p2
 
 
-for mode in ("random", "heterotypic", "homotypic"):
+for mode in a.pairings:
     p1, p2 = draw_pairs(mode)
     parents = np.concatenate([p1, p2])
     keep = np.setdiff1d(np.arange(N), parents)
@@ -102,7 +113,7 @@ for mode in ("random", "heterotypic", "homotypic"):
         names = np.r_[bc[keep], [f"dbl{k:05d}_{bc[i]}+{bc[j]}" for k, (i, j) in enumerate(zip(p1, p2))]]
         perm = rng.permutation(M.shape[0])                          # shuffle droplet order
         M, is_d, names = M[perm], is_d[perm], names[perm]
-        out = Path("data/processed") / f"sim-{a.base}-{mode}-f{f:g}"
+        out = Path("data/processed") / (f"sim-{a.base}-{mode}-f{f:g}" + (f"-r{a.seed}" if a.seed else ""))
         out.mkdir(parents=True, exist_ok=True)
         with gzip.open(out / "matrix.mtx.gz", "wb") as fh:
             scipy.io.mmwrite(fh, M.T.tocoo())                         # genes x droplets

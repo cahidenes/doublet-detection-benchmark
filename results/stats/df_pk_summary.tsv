@@ -1,0 +1,10 @@
+setting	mean_auprc
+fixed pK = 0.005	0.4767
+fixed pK = 0.01	0.4819
+fixed pK = 0.05	0.4442
+fixed pK = 0.09	0.4167
+fixed pK = 0.2	0.3704
+fixed pK = 0.3	0.3480
+best fixed pK per dataset (oracle)	0.4880
+automatic BCmvn (main run)	0.4207
+Xi & Li (2021)	0.5369

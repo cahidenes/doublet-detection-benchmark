@@ -1,0 +1,12 @@
+ensemble	mean_auprc	median_auprc	wins_vs_best_single	losses	p_vs_best_single	picked
+scdblfinder	0.5634	0.5519	0.0000	0.0000	1.0000	
+scdblfinder+vaeda	0.5673	0.5345	8.0000	8.0000	0.3755	
+doubletdetection+scdblfinder	0.5673	0.5278	7.0000	9.0000	1.0000	
+doubletdetection+scdblfinder+vaeda	0.5709	0.5347	8.0000	8.0000	0.5282	
+cxds+scdblfinder+vaeda	0.5576	0.5316	7.0000	9.0000	0.5619	
+bcds+cxds+doubletfinder	0.5095	0.4745	5.0000	11.0000	0.0250	
+chord (GBM on its components)	0.4525	0.3944				
+best on all 16 (optimistic): doubletdetection+scdblfinder+vaeda	0.5709	0.5347				
+LODO-selected, 1 tool(s)	0.5634	0.5519	0.0000	0.0000	1.0000	scdblfinder (16)
+LODO-selected, 2 tool(s)	0.5598	0.5208	7.0000	9.0000	0.5619	scdblfinder+vaeda (9); doubletdetection+scdblfinder (7)
+LODO-selected, 3 tool(s)	0.5613	0.5347	6.0000	10.0000	0.5619	doubletdetection+scdblfinder+vaeda (14); doubletdetection+scdblfinder+solo (1); dbldensity+scdblfinder+solo (1)

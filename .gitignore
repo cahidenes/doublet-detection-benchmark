@@ -21,3 +21,7 @@ results/sensitivity/eval/
 !results/sim_metrics.tsv
 !results/stability_metrics.tsv
 !results/downstream_metrics.tsv
+!results/heuristic_metrics.tsv
+!results/singletcode_metrics.tsv
+!results/sim_robustness_metrics.tsv
+!results/reference/

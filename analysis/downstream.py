@@ -7,7 +7,10 @@ Removal: the tool's default calls; for score-only methods (baselines, DoubletDen
 top round(labeled rate x n) droplets by score. References:
   oracle   remove exactly the labeled doublets (the target)
   none     remove nothing (what happens without doublet detection)
-  reseed   oracle again with another clustering seed: the noise floor of the comparison
+  reseed   oracle again with another clustering seed: noise floor for clustering (ARI)
+  subsample  oracle minus k random singlets (k = labeled doublets): noise floor for HVG and
+           marker overlap, which reseeding does not change
+  random   remove k random droplets: a null tool with the oracle's removal budget
 
 Metrics vs the oracle analysis:
   hvg_jaccard       overlap of the 2000 HVGs
@@ -114,6 +117,12 @@ def run_dataset(ds):
 
     record("reseed", ~is_dbl, seed=1)
     record("none", np.ones(n, bool))
+    rng = np.random.default_rng(0)
+    keep = ~is_dbl.copy()
+    keep[rng.choice(np.flatnonzero(~is_dbl), size=min(k, (~is_dbl).sum() // 2), replace=False)] = False
+    record("subsample", keep)
+    keep = np.ones(n, bool); keep[rng.choice(n, size=k, replace=False)] = False
+    record("random", keep)
     for t in sorted(d.tool):
         p = pd.read_csv(ROOT / f"results/pred/{t}/{ds}/s0_r1.0.tsv", sep="\t")
         p = p.set_index("barcode").loc[lab.barcode]
@@ -152,9 +161,9 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from style import CAT, INK2, SURF, clean, setup
     setup()
-    REF = {"reseed": "Oracle, other seed", "none": "No removal"}
+    NAMES.update({"random": "Random k droplets"})
     rank_order = list(pd.read_csv(STATS / "ranks.tsv", sep="\t", index_col=0).index)
-    order = rank_order[::-1]          # same order as the accuracy figures (best on top)
+    order = (rank_order + ["random"])[::-1]   # accuracy-figure order (best on top), null tool last
     panels = [("ari", "Clustering ARI vs oracle"), ("hvg_jaccard", "HVG Jaccard vs oracle"),
               ("marker_jaccard", "Marker Jaccard vs oracle"),
               ("doublet_clusters", "Doublet clusters left (total)")]
@@ -169,7 +178,10 @@ if __name__ == "__main__":
                 ax.scatter(v, np.full(len(v), i) + np.linspace(-.18, .18, len(v)), s=10,
                            color="#b9b8b2", zorder=2)
                 ax.scatter([v.median()], [i], s=60, color=CAT[0], edgecolor=SURF, lw=1.2, zorder=3)
-        for ref, ls in (("none", (0, (3, 3))), ("reseed", (0, (1, 2)))):
+        floor = "reseed" if col == "ari" else "subsample"
+        for ref, ls in (("none", (0, (3, 3))), (floor, (0, (1, 2)))):
+            if col == "doublet_clusters" and ref != "none":
+                continue
             v = m[m.tool == ref][col]
             x = v.sum() if col == "doublet_clusters" else v.median()
             ax.axvline(x, color=INK2, lw=1.2, ls=ls, zorder=1)
@@ -180,7 +192,8 @@ if __name__ == "__main__":
         clean(ax, grid="x")
     axes[0].set_yticks(range(len(order)), [NAMES[t] for t in order])
     fig.suptitle("Downstream impact of each tool's doublet removal, 16 real datasets. Blue = median "
-                 "(grey = datasets); dashed = no removal; dotted = oracle re-clustered with another seed",
+                 "(grey = datasets); dashed = no removal;\ndotted = noise floor (ARI: oracle re-clustered with "
+                 "another seed; HVG/markers: oracle minus k random singlets)",
                  x=0.01, ha="left", fontsize=10.5)
     fig.tight_layout(rect=(0, 0, 1, 0.94), w_pad=2)
     fig.savefig(FIG / "downstream.png", dpi=200)

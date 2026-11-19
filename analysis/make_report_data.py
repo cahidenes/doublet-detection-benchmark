@@ -29,6 +29,11 @@ def md(df, fmt="{:.3f}", index=True):
     return "\n".join([head, sep, *rows])
 
 
+def _named(df):
+    df = df.copy(); df.index = [NAMES.get(t, t) for t in df.index]; df.index.name = "tool"
+    return df
+
+
 def tool_by_ds(col, fmt="{:.3f}", agg="mean", src=d):
     m = src.pivot(index="tool", columns="dataset", values=col).reindex(index=ORDER, columns=DS)
     m[agg] = getattr(m, agg)(axis=1)
@@ -52,7 +57,10 @@ out = ["# Report data",
        "11. [Statistics](#11-statistics) · 12. [DoubletFinder pK](#12-doubletfinder-pk-sensitivity) · "
        "13. [Simulated doublets](#13-simulated-doublets) · 14. [Stability](#14-stability-across-seeds) · "
        "15. [Downstream](#15-downstream-impact) · 16. [Failed runs](#16-failed-runs) · "
-       "17. [Raw files](#17-raw-files)", ""]
+       "17. [Raw files](#17-raw-files) · 18. [Paired effect sizes and F1 statistics](#18-paired-effect-sizes-and-f1-statistics) · "
+       "19. [Label noise](#19-label-noise-species-mixtures) · 20. [Lineage co-expression](#20-lineage-co-expression) · "
+       "21. [Ensembles](#21-ensembles) · 22. [Xi & Li comparison](#22-comparison-with-xi--li-2021) · "
+       "23. [Realistic expected rate](#23-realistic-expected-rate) · 24. [singletCode](#24-singletcode-independent-validation)", ""]
 
 # 1 datasets
 ds = d.groupby("dataset").agg(droplets=("n", "first"), rate=("true_rate", "first")).loc[DS]
@@ -181,11 +189,16 @@ pk = pd.read_csv(R / "sensitivity/df_pk.tsv", sep="\t").pivot(index="pK", column
                                                              values="auprc")
 pk.index = [f"{x:g}" for x in pk.index]; pk.index.name = "pK"
 auto = d[d.tool == "doubletfinder"].set_index("dataset").auprc
+import re as _re
+dfpk = pd.Series({ds_: float(_re.search(r"DoubletFinder: pK = ([\d.e-]+), nExp",
+                  (ROOT / f"logs/doubletfinder/{ds_}/s0_r1.0.log").read_text()).group(1)) for ds_ in DS})
 out += ["## 12. DoubletFinder pK sensitivity",
         "",
-        "AUPRC with pK fixed. Bottom row: the main run, where pK is chosen automatically "
-        "(BCmvn), which picked 0.005 (pbmc-1C-dm), 0.13 (pbmc-2stim-dm) and 0.3 (pbmc-ch).", "",
-        md(pd.concat([pk, pd.DataFrame([auto[pk.columns]], index=["automatic"])])), ""]
+        "AUPRC with pK fixed. Bottom rows: the main run, where pK is chosen automatically "
+        "(BCmvn), and the pK it picked.", "",
+        md(pd.concat([pk, pd.DataFrame([auto[pk.columns]], index=["automatic"]),
+                      pd.DataFrame([dfpk[pk.columns]], index=["picked pK"])]).T
+           .rename_axis("dataset")), ""]
 
 # 13-15 stretch goals
 sim = pd.read_csv(STATS / "simulation_auprc.tsv", sep="\t", index_col=0)
@@ -197,9 +210,23 @@ out += ["## 13. Simulated doublets",
         "",
         "Synthetic doublets from labeled singlets (`scripts/simulate_doublets.py`). Each dataset "
         "has 5,455 droplets, 545 doublets (rate 0.10 = chance-level AUPRC), 2 base datasets × "
-        "3 pairings × 2 depths. `f=1` sums the two parents' counts; `f=0.5` binomially "
-        "downsamples the sum to singlet depth. The values below are AUPRC, averaged over the two "
-        "base datasets.", "", md(sim), "", "### Per base dataset", "", md(simb), ""]
+        "4 pairings × 2 depths × 3 independent draws. `f=1` sums the two parents' counts; `f=0.5` "
+        "binomially downsamples the sum to singlet depth. `heterotypic` draws the partner's "
+        "cluster uniformly, `heteroweighted` in proportion to cluster size. The values below are "
+        "AUPRC, averaged over the base datasets and draws.", "", md(sim), "",
+        "### SD between the 3 draws (mean over the 2 bases)", "",
+        md(_named(pd.read_csv(STATS / "simulation_auprc_sd.tsv", sep="\t", index_col=0)), "{:.3f}"), "",
+        "### Per base dataset", "", md(simb), "",
+        "### Real doublet / singlet library-size ratio", "",
+        "Median library size of labeled doublets ÷ that of labeled singlets, per real dataset. "
+        "f = 1 gives about 2 and f = 0.5 about 1.", "",
+        md(pd.read_csv(STATS / "simulation_lib_ratio.tsv", sep="\t"), "{:.2f}", index=False), ""]
+srob = STATS / "sim_robustness.tsv"
+if srob.exists():
+    x = pd.read_csv(srob, sep="\t"); x["tool"] = x.tool.map(NAMES)
+    out += ["### Rate robustness on simulated doublets", "",
+            "Rate-taking tools given 0.5×, 1× or 2× the true rate (0.10) on the 16 seed-0 "
+            "simulated datasets; medians.", "", md(x, index=False), ""]
 if (STATS / "stability.tsv").exists():
     stb = pd.read_csv(STATS / "stability.tsv", sep="\t")
     sm = stb.groupby("tool")[["auprc_sd", "auprc_range", "f1_sd", "call_jaccard"]].median()
@@ -217,9 +244,11 @@ if (STATS / "stability.tsv").exists():
             md(sr), "", "### Per tool and dataset", "",
             md(stb.assign(tool=stb.tool.map(NAMES)), "{:.4f}", index=False), ""]
 dsm = pd.read_csv(R / "downstream_metrics.tsv", sep="\t")
-REFN = {**NAMES, "none": "(no removal)", "reseed": "(oracle, other seed)"}
+REFN = {**NAMES, "none": "(no removal)", "reseed": "(oracle, other seed)",
+        "subsample": "(oracle minus k random singlets)", "random": "(k random droplets)"}
 dss = pd.read_csv(STATS / "downstream_summary.tsv", sep="\t", index_col=0)
-dss = dss.loc[["reseed", "none"] + [t for t in ORDER if t in dss.index]]
+dss = dss.loc[[t for t in ["reseed", "subsample", "none", "random"] if t in dss.index]
+              + [t for t in ORDER if t in dss.index]]
 dss.index = [REFN[t] for t in dss.index]; dss.index.name = "tool"
 out += ["## 15. Downstream impact",
         "",
@@ -234,12 +263,14 @@ out += ["## 15. Downstream impact",
             "singlets_removed"]].sort_values(["dataset", "tool"]), "{:.3f}", index=False), ""]
 
 # 13 failures
-allm = pd.concat([pd.read_csv(R / f, sep="\t") for f in ("metrics.tsv", "scaling_metrics.tsv", "sim_metrics.tsv", "stability_metrics.tsv") if (R / f).exists()])
+allm = pd.concat([pd.read_csv(R / f, sep="\t") for f in ("metrics.tsv", "scaling_metrics.tsv", "sim_metrics.tsv", "stability_metrics.tsv",
+                                                    "heuristic_metrics.tsv", "sim_robustness_metrics.tsv",
+                                                    "singletcode_metrics.tsv") if (R / f).exists()])
 fail = allm[allm.status != "ok"][["tool", "dataset", "rate_mult", "error"]]
 fail["error"] = fail.error.str.replace("|", "/", regex=False).str.slice(0, 140)
 n_total = len(allm)
 out += ["## 16. Failed runs", "",
-        f"{len(fail)} of {n_total} runs failed (main run, robustness, scaling, simulation and stability together). "
+        f"{len(fail)} of {n_total} runs failed (all experiments together). "
         "The `error` column is the last lines of the log. For both Chord failures, the actual "
         "error is earlier in the log: `overkillDB2 -> sample(): cannot take a sample larger than "
         "the population when 'replace = FALSE'` (2× the labeled rate is 0.62 and 0.75).", "",
@@ -254,8 +285,75 @@ out += ["## 17. Raw files", "", "| file | content |", "|---|---|",
         "| `results/stats/*.tsv` | Ranks, Friedman test, pairwise tests, agreement, rate estimation |",
         "| `results/robustness_summary.tsv`, `results/scaling_summary.tsv` | Summary tables for sections 7 and 9 |",
         "| `results/sensitivity/df_pk.tsv` | DoubletFinder pK sensitivity |",
+        "| `results/heuristic_metrics.tsv`, `sim_robustness_metrics.tsv`, `singletcode_metrics.tsv` | Realistic-rate runs, rate robustness on simulations, singletCode validation |",
+        "| `results/reference/xili2021_real.tsv` | Xi & Li (2021) per-dataset AUPRC/AUROC (their Zenodo 4444303, result.xlsx) |",
         "| `results/pred/` (not in git, about 0.3 GB) | Per-droplet scores and calls; rebuild them with the pipeline |",
         ""]
+
+# 18-24 final-report additions
+pa = pd.read_csv(STATS / "pairwise_auprc.tsv", sep="\t")
+pa = pa[~pa.tool_a.isin(["libsize", "ngenes"]) & ~pa.tool_b.isin(["libsize", "ngenes"])]
+pa = pa.assign(tool_a=pa.tool_a.map(NAMES), tool_b=pa.tool_b.map(NAMES)).sort_values("p")
+pf = pd.read_csv(STATS / "pairwise_f1_default.tsv", sep="\t")
+pf = pf.assign(tool_a=pf.tool_a.map(NAMES), tool_b=pf.tool_b.map(NAMES)).sort_values("p_holm")
+cols = ["tool_a", "tool_b", "median_diff", "median_diff_lo", "median_diff_hi", "rank_biserial",
+        "cliffs_delta", "wins_a", "wins_b", "p_holm"]
+bs = _named(pd.read_csv(STATS / "ranks_by_study.tsv", sep="\t", index_col=0))
+out += ["## 18. Paired effect sizes and F1 statistics", "",
+        "Cliff's δ is unpaired, so dataset difficulty swamps it. Paired alternatives: the "
+        "matched-pairs rank-biserial r (−1…1; +1 = tool_a better on every dataset, weighted by "
+        "rank of |difference|) and the median paired difference with a 95% bootstrap CI "
+        "(5,000 resamples of datasets).", "",
+        "### AUPRC, the 55 pairs of non-baseline methods", "", md(pa[cols], "{:.3g}", index=False), "",
+        f"### Default-call F1 ({pf.significant.sum()} of {len(pf)} pairs with Holm p < 0.05)", "",
+        "10 methods with calls (no baselines, no DoubletDensity).", "", md(pf[cols], "{:.3g}", index=False), "",
+        "### Sensitivity: averaged within study first (9 blocks)", "",
+        "PBMC demuxlet (5 lanes), HMEC MULTI-seq (3) and the species mixtures (2) are averaged "
+        "into one block each before ranking.", "", md(bs), ""]
+ln = pd.read_csv(STATS / "label_noise.tsv", sep="\t"); ln["tool"] = ln.tool.map(NAMES)
+out += ["## 19. Label noise (species mixtures)", "",
+        "In hm-12k and hm-6k only cross-species doublets are labeled. Species = 2-means cluster on "
+        "the expression PCA (the matrices use human orthologs for mouse genes). `expected_unlabeled` "
+        "= k (q² + (1−q)²) / 2q(1−q) for a species fraction q. For each tool's top-k droplets "
+        "(k = labeled doublets), the labeled singlets among them (`n_fp`) are compared by "
+        "library size with the median singlet of their own species.", "", md(ln, index=False), ""]
+li = pd.read_csv(STATS / "lineage_summary.tsv", sep="\t"); li["tool"] = li.tool.map(lambda t: NAMES.get(t, t))
+out += ["## 20. Lineage co-expression", "",
+        "6 PBMC datasets. A droplet co-expresses if it passes two of: T (CD3E+CD3D ≥ 2 UMIs), "
+        "B (CD79A+MS4A1 ≥ 2), myeloid (CD14+LYZ ≥ 5). `coexp_frac` = share of the tool's doublets "
+        "that co-express; `coexp_recall` = share of all co-expressing droplets the tool flags "
+        "(medians over datasets); `unlabeled_found` = co-expressing droplets labeled singlet that "
+        "the tool flags (sum over datasets, out of `unlabeled_total`).", "", md(li, index=False), ""]
+en = pd.read_csv(STATS / "ensemble.tsv", sep="\t")
+out += ["## 21. Ensembles", "",
+        "Rank average of 2–3 tools' scores. LODO = the combination is chosen on the other 15 "
+        "datasets and scored on the held-out one. Wins/losses and the Wilcoxon p are against "
+        "the best single tool.", "", md(en, index=False), ""]
+xs = _named(pd.read_csv(STATS / "xili_summary.tsv", sep="\t", index_col=0))
+xc = pd.read_csv(STATS / "xili_comparison.tsv", sep="\t")
+xc = xc.assign(tool=xc.tool.map(NAMES))
+out += ["## 22. Comparison with Xi & Li (2021)", "",
+        "Same 16 datasets; their values are from their Zenodo record (`result.xlsx`). "
+        "DoubletDensity is compared with its predecessor doubletCells. Xi & Li have no "
+        "DoubletDetection value for pdx-MULTI.", "", md(xs), "",
+        "### Per dataset", "", md(xc.drop(columns=[c for c in xc.columns if c.startswith("auroc")] + ["d_auroc"]),
+                                   index=False), ""]
+if (STATS / "heuristic_rate.tsv").exists():
+    hr = pd.read_csv(STATS / "heuristic_rate.tsv", sep="\t"); hr["tool"] = hr.tool.map(NAMES)
+    fr_ = _named(pd.read_csv(STATS / "f1_realistic.tsv", sep="\t", index_col=0))
+    out += ["## 23. Realistic expected rate", "",
+            "Rate-taking tools given the 10x guideline (0.8% per 1,000 droplets) instead of the "
+            "labeled rate. Medians over datasets.", "", md(hr, index=False), "",
+            "### Default-call F1 of all callers under the realistic setting", "",
+            "Tools without a rate input are unchanged.", "", md(fr_), ""]
+if (STATS / "singletcode_auprc.tsv").exists():
+    sca = _named(pd.read_csv(STATS / "singletcode_auprc.tsv", sep="\t", index_col=0))
+    scs = pd.read_csv(STATS / "singletcode_stats.tsv", sep="\t")
+    out += ["## 24. singletCode independent validation", "",
+            "Singlets identified by lineage barcodes (singletCode, Zhang et al. 2024) in 6 "
+            "Watermelon-barcoded T47D samples; doublets simulated from them at rate 0.10. Mean AUPRC "
+            "over the 6 samples.", "", md(sca), "", "### Statistics per scenario (blocks = 6 samples)", "",
+            md(scs, "{:.3g}", index=False), ""]
 
 (ROOT / "report").mkdir(exist_ok=True)
 (ROOT / "report/data.md").write_text("\n".join(out))

@@ -29,14 +29,14 @@ INTERP = {k: os.path.expanduser(v) for k, v in config["interpreters"].items()}
 METRICS_OUT = config.get("metrics_out", "results/metrics.tsv")
 
 wildcard_constraints:
-    ds="[^/]+", tool="[^/]+", seed=r"\d+", mult=r"[0-9.]+"
+    ds="[^/]+", tool="[^/]+", seed=r"\d+", mult=r"[0-9.]+|h"
 
 
 def targets(kind):
     """All (tool, ds, seed, mult) runs; mult != 1 only for tools that take an expected rate."""
     return [f"results/{kind}/{t}/{ds}/s{s}_r{m}.tsv"
             for t, spec in TOOLS.items() for ds in DATASETS for s in SEEDS for m in MULTS
-            if float(m) == 1.0 or spec.get("rate")]
+            if m != "h" and float(m) == 1.0 or spec.get("rate")]
 
 
 rule all:
@@ -66,9 +66,14 @@ rule run_tool:
         heavy=lambda w: TOOLS[w.tool].get("heavy", 0),
     run:
         import subprocess
-        # expected rate = multiplier x labeled rate (computed here, once the data exists)
+        # expected rate = multiplier x labeled rate (computed here, once the data exists);
+        # mult "h" = what a user without labels would set: the 10x loading guideline,
+        # 0.8% per 1,000 recovered droplets
         lab = pd.read_csv(f"{input}/labels.tsv", sep="\t")
-        rate = float(wildcards.mult) * lab["is_doublet"].mean()
+        if wildcards.mult == "h":
+            rate = 0.008 * len(lab) / 1000
+        else:
+            rate = float(wildcards.mult) * lab["is_doublet"].mean()
         if params.is_r:
             cmd = [params.interp, params.script, str(input), str(output), wildcards.ds,
                    wildcards.tool, wildcards.seed, str(rate)]
@@ -105,6 +110,8 @@ rule collect:
             r = pd.read_csv(e, sep="\t")
             bm = pd.read_csv(b, sep="\t")
             r["wall_s"], r["max_rss_mb"] = bm["s"].iloc[0], bm["max_rss"].iloc[0]
-            r["rate_mult"] = float(e.rsplit("_r", 1)[1][:-4])
+            m = e.rsplit("_r", 1)[1][:-4]
+            r["rate_mult"] = float("nan") if m == "h" else float(m)
+            r["rate_setting"] = "heuristic" if m == "h" else "labeled"
             rows.append(r)
         pd.concat(rows).to_csv(output[0], sep="\t", index=False)

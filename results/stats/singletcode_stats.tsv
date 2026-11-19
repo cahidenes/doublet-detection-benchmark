@@ -1,0 +1,8 @@
+scenario	n_datasets	friedman_p	best_mean_rank	scdblfinder_rank	top3	not_sig_worse_than_best
+heteroweighted, f=1	6	1.462e-09	scdblfinder	1	scdblfinder, bcds, hybrid	bcds, chord, cxds, dbldensity, doubletdetection, doubletfinder, hybrid, libsize, ngenes, scrublet, solo, vaeda
+random, f=1	6	4.578e-09	solo	2	solo, scdblfinder, bcds	bcds, chord, cxds, dbldensity, doubletdetection, doubletfinder, hybrid, libsize, ngenes, scdblfinder, scrublet, vaeda
+homotypic, f=1	6	1.306e-09	bcds	4	bcds, hybrid, solo	chord, cxds, dbldensity, doubletdetection, doubletfinder, hybrid, libsize, ngenes, scdblfinder, scrublet, solo, vaeda
+heteroweighted, f=0.5	6	4.545e-10	scrublet	5	scrublet, vaeda, doubletfinder	bcds, chord, cxds, dbldensity, doubletdetection, doubletfinder, hybrid, libsize, ngenes, scdblfinder, solo, vaeda
+random, f=0.5	6	6.446e-10	scrublet	5	scrublet, vaeda, doubletfinder	bcds, chord, cxds, dbldensity, doubletdetection, doubletfinder, hybrid, libsize, ngenes, scdblfinder, solo, vaeda
+homotypic, f=0.5	6	4.058e-10	scrublet	4	scrublet, vaeda, dbldensity	bcds, chord, cxds, dbldensity, doubletdetection, doubletfinder, hybrid, libsize, ngenes, scdblfinder, solo, vaeda
+all	36	1.103e-21	scdblfinder	1	scdblfinder, vaeda, bcds	scrublet, vaeda

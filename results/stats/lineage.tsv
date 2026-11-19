@@ -1,0 +1,151 @@
+dataset	tool	set	n	coexp_frac	coexp_recall	coexp_unlabeled_found
+pbmc-ch	labeled doublets	reference	2545	0.0393	0.8333	0
+pbmc-ch	labeled singlets	reference	12727	0.0016	0.1667	20
+pbmc-ch	libsize	top-k	2545	0.0409	0.8667	15
+pbmc-ch	ngenes	top-k	2545	0.0413	0.8750	16
+pbmc-ch	scrublet	top-k	2545	0.0389	0.8250	17
+pbmc-ch	scrublet	default calls	2859	0.0353	0.8417	18
+pbmc-ch	doubletdetection	top-k	2545	0.0424	0.9000	19
+pbmc-ch	doubletdetection	default calls	1849	0.0508	0.7833	15
+pbmc-ch	solo	top-k	2545	0.0440	0.9333	17
+pbmc-ch	solo	default calls	3198	0.0356	0.9500	18
+pbmc-ch	vaeda	top-k	2545	0.0448	0.9500	19
+pbmc-ch	vaeda	default calls	2021	0.0549	0.9250	19
+pbmc-ch	scdblfinder	top-k	2545	0.0428	0.9083	19
+pbmc-ch	scdblfinder	default calls	1914	0.0528	0.8417	17
+pbmc-ch	dbldensity	top-k	2545	0.0389	0.8250	17
+pbmc-ch	cxds	top-k	2545	0.0409	0.8667	16
+pbmc-ch	cxds	default calls	2176	0.0469	0.8500	16
+pbmc-ch	bcds	top-k	2545	0.0424	0.9000	18
+pbmc-ch	bcds	default calls	1863	0.0521	0.8083	14
+pbmc-ch	hybrid	top-k	2545	0.0444	0.9417	18
+pbmc-ch	hybrid	default calls	1873	0.0566	0.8833	17
+pbmc-ch	doubletfinder	top-k	2545	0.0299	0.6333	10
+pbmc-ch	doubletfinder	default calls	2545	0.0299	0.6333	10
+pbmc-ch	chord	top-k	2545	0.0409	0.8667	16
+pbmc-ch	chord	default calls	2545	0.0409	0.8667	16
+pbmc-1A-dm	labeled doublets	reference	120	0.0500	0.3529	0
+pbmc-1A-dm	labeled singlets	reference	3178	0.0035	0.6471	11
+pbmc-1A-dm	libsize	top-k	120	0.0667	0.4706	5
+pbmc-1A-dm	ngenes	top-k	120	0.0750	0.5294	5
+pbmc-1A-dm	scrublet	top-k	120	0.0750	0.5294	4
+pbmc-1A-dm	scrublet	default calls	12	0.1667	0.1176	1
+pbmc-1A-dm	doubletdetection	top-k	120	0.1000	0.7059	7
+pbmc-1A-dm	doubletdetection	default calls	79	0.1392	0.6471	6
+pbmc-1A-dm	solo	top-k	120	0.0917	0.6471	5
+pbmc-1A-dm	solo	default calls	481	0.0291	0.8235	8
+pbmc-1A-dm	vaeda	top-k	120	0.1083	0.7647	7
+pbmc-1A-dm	vaeda	default calls	107	0.1215	0.7647	7
+pbmc-1A-dm	scdblfinder	top-k	120	0.1083	0.7647	7
+pbmc-1A-dm	scdblfinder	default calls	236	0.0551	0.7647	7
+pbmc-1A-dm	dbldensity	top-k	120	0.0833	0.5882	5
+pbmc-1A-dm	cxds	top-k	120	0.0917	0.6471	6
+pbmc-1A-dm	cxds	default calls	242	0.0579	0.8235	8
+pbmc-1A-dm	bcds	top-k	120	0.0917	0.6471	6
+pbmc-1A-dm	bcds	default calls	208	0.0625	0.7647	7
+pbmc-1A-dm	hybrid	top-k	120	0.1083	0.7647	7
+pbmc-1A-dm	hybrid	default calls	268	0.0522	0.8235	8
+pbmc-1A-dm	doubletfinder	top-k	120	0.0333	0.2353	2
+pbmc-1A-dm	doubletfinder	default calls	120	0.0333	0.2353	2
+pbmc-1A-dm	chord	top-k	120	0.1000	0.7059	6
+pbmc-1A-dm	chord	default calls	120	0.1000	0.7059	6
+pbmc-1B-dm	labeled doublets	reference	130	0.0462	0.4000	0
+pbmc-1B-dm	labeled singlets	reference	3660	0.0025	0.6000	9
+pbmc-1B-dm	libsize	top-k	130	0.0692	0.6000	6
+pbmc-1B-dm	ngenes	top-k	130	0.0692	0.6000	5
+pbmc-1B-dm	scrublet	top-k	130	0.0385	0.3333	2
+pbmc-1B-dm	scrublet	default calls	9	0.1111	0.0667	1
+pbmc-1B-dm	doubletdetection	top-k	130	0.0769	0.6667	5
+pbmc-1B-dm	doubletdetection	default calls	226	0.0442	0.6667	5
+pbmc-1B-dm	solo	top-k	130	0.0615	0.5333	5
+pbmc-1B-dm	solo	default calls	696	0.0187	0.8667	7
+pbmc-1B-dm	vaeda	top-k	130	0.0923	0.8000	6
+pbmc-1B-dm	vaeda	default calls	174	0.0690	0.8000	6
+pbmc-1B-dm	scdblfinder	top-k	130	0.0846	0.7333	5
+pbmc-1B-dm	scdblfinder	default calls	263	0.0456	0.8000	6
+pbmc-1B-dm	dbldensity	top-k	130	0.0769	0.6667	4
+pbmc-1B-dm	cxds	top-k	130	0.0846	0.7333	6
+pbmc-1B-dm	cxds	default calls	370	0.0297	0.7333	6
+pbmc-1B-dm	bcds	top-k	130	0.0923	0.8000	6
+pbmc-1B-dm	bcds	default calls	327	0.0398	0.8667	7
+pbmc-1B-dm	hybrid	top-k	130	0.0923	0.8000	6
+pbmc-1B-dm	hybrid	default calls	302	0.0397	0.8000	6
+pbmc-1B-dm	doubletfinder	top-k	130	0.0385	0.3333	2
+pbmc-1B-dm	doubletfinder	default calls	130	0.0385	0.3333	2
+pbmc-1B-dm	chord	top-k	130	0.0846	0.7333	6
+pbmc-1B-dm	chord	default calls	130	0.0846	0.7333	6
+pbmc-1C-dm	labeled doublets	reference	316	0.0570	0.9474	0
+pbmc-1C-dm	labeled singlets	reference	4954	0.0002	0.0526	1
+pbmc-1C-dm	libsize	top-k	316	0.0285	0.4737	0
+pbmc-1C-dm	ngenes	top-k	316	0.0348	0.5789	0
+pbmc-1C-dm	scrublet	top-k	316	0.0380	0.6316	1
+pbmc-1C-dm	scrublet	default calls	10	0.0000	0.0000	0
+pbmc-1C-dm	doubletdetection	top-k	316	0.0538	0.8947	1
+pbmc-1C-dm	doubletdetection	default calls	192	0.0833	0.8421	1
+pbmc-1C-dm	solo	top-k	316	0.0411	0.6842	0
+pbmc-1C-dm	solo	default calls	824	0.0231	1.0000	1
+pbmc-1C-dm	vaeda	top-k	316	0.0538	0.8947	1
+pbmc-1C-dm	vaeda	default calls	336	0.0536	0.9474	1
+pbmc-1C-dm	scdblfinder	top-k	316	0.0570	0.9474	1
+pbmc-1C-dm	scdblfinder	default calls	508	0.0374	1.0000	1
+pbmc-1C-dm	dbldensity	top-k	316	0.0411	0.6842	1
+pbmc-1C-dm	cxds	top-k	316	0.0538	0.8947	1
+pbmc-1C-dm	cxds	default calls	550	0.0327	0.9474	1
+pbmc-1C-dm	bcds	top-k	316	0.0570	0.9474	1
+pbmc-1C-dm	bcds	default calls	461	0.0412	1.0000	1
+pbmc-1C-dm	hybrid	top-k	316	0.0601	1.0000	1
+pbmc-1C-dm	hybrid	default calls	533	0.0356	1.0000	1
+pbmc-1C-dm	doubletfinder	top-k	316	0.0475	0.7895	0
+pbmc-1C-dm	doubletfinder	default calls	316	0.0475	0.7895	0
+pbmc-1C-dm	chord	top-k	316	0.0601	1.0000	1
+pbmc-1C-dm	chord	default calls	316	0.0601	1.0000	1
+pbmc-2ctrl-dm	labeled doublets	reference	1598	0.1058	0.6475	0
+pbmc-2ctrl-dm	labeled singlets	reference	12315	0.0075	0.3525	92
+pbmc-2ctrl-dm	libsize	top-k	1598	0.1001	0.6130	66
+pbmc-2ctrl-dm	ngenes	top-k	1598	0.1145	0.7011	68
+pbmc-2ctrl-dm	scrublet	top-k	1598	0.1283	0.7854	59
+pbmc-2ctrl-dm	scrublet	default calls	1146	0.1571	0.6897	44
+pbmc-2ctrl-dm	doubletdetection	top-k	1598	0.1245	0.7625	55
+pbmc-2ctrl-dm	doubletdetection	default calls	1630	0.1294	0.8084	56
+pbmc-2ctrl-dm	solo	top-k	1598	0.1364	0.8352	71
+pbmc-2ctrl-dm	solo	default calls	2793	0.0874	0.9349	82
+pbmc-2ctrl-dm	vaeda	top-k	1598	0.1477	0.9042	73
+pbmc-2ctrl-dm	vaeda	default calls	1628	0.1474	0.9195	76
+pbmc-2ctrl-dm	scdblfinder	top-k	1598	0.1464	0.8966	69
+pbmc-2ctrl-dm	scdblfinder	default calls	2009	0.1244	0.9579	81
+pbmc-2ctrl-dm	dbldensity	top-k	1598	0.1427	0.8736	67
+pbmc-2ctrl-dm	cxds	top-k	1598	0.1452	0.8889	81
+pbmc-2ctrl-dm	cxds	default calls	1404	0.1603	0.8621	79
+pbmc-2ctrl-dm	bcds	top-k	1598	0.1383	0.8467	72
+pbmc-2ctrl-dm	bcds	default calls	1638	0.1368	0.8582	73
+pbmc-2ctrl-dm	hybrid	top-k	1598	0.1433	0.8774	79
+pbmc-2ctrl-dm	hybrid	default calls	1900	0.1274	0.9272	81
+pbmc-2ctrl-dm	doubletfinder	top-k	1598	0.0807	0.4943	48
+pbmc-2ctrl-dm	doubletfinder	default calls	1598	0.0807	0.4943	48
+pbmc-2ctrl-dm	chord	top-k	1598	0.1433	0.8774	81
+pbmc-2ctrl-dm	chord	default calls	1598	0.1433	0.8774	81
+pbmc-2stim-dm	labeled doublets	reference	1631	0.0619	0.6433	0
+pbmc-2stim-dm	labeled singlets	reference	12285	0.0046	0.3567	56
+pbmc-2stim-dm	libsize	top-k	1631	0.0564	0.5860	38
+pbmc-2stim-dm	ngenes	top-k	1631	0.0668	0.6943	41
+pbmc-2stim-dm	scrublet	top-k	1631	0.0773	0.8025	35
+pbmc-2stim-dm	scrublet	default calls	1182	0.0948	0.7134	30
+pbmc-2stim-dm	doubletdetection	top-k	1631	0.0736	0.7643	37
+pbmc-2stim-dm	doubletdetection	default calls	1713	0.0776	0.8471	39
+pbmc-2stim-dm	solo	top-k	1631	0.0797	0.8280	45
+pbmc-2stim-dm	solo	default calls	2974	0.0504	0.9554	51
+pbmc-2stim-dm	vaeda	top-k	1631	0.0871	0.9045	47
+pbmc-2stim-dm	vaeda	default calls	1683	0.0844	0.9045	47
+pbmc-2stim-dm	scdblfinder	top-k	1631	0.0871	0.9045	45
+pbmc-2stim-dm	scdblfinder	default calls	1931	0.0756	0.9299	48
+pbmc-2stim-dm	dbldensity	top-k	1631	0.0822	0.8535	40
+pbmc-2stim-dm	cxds	top-k	1631	0.0785	0.8153	46
+pbmc-2stim-dm	cxds	default calls	1434	0.0851	0.7771	42
+pbmc-2stim-dm	bcds	top-k	1631	0.0809	0.8408	44
+pbmc-2stim-dm	bcds	default calls	1570	0.0834	0.8344	43
+pbmc-2stim-dm	hybrid	top-k	1631	0.0840	0.8726	48
+pbmc-2stim-dm	hybrid	default calls	1838	0.0773	0.9045	50
+pbmc-2stim-dm	doubletfinder	top-k	1631	0.0429	0.4459	22
+pbmc-2stim-dm	doubletfinder	default calls	1631	0.0429	0.4459	22
+pbmc-2stim-dm	chord	top-k	1631	0.0503	0.5223	31
+pbmc-2stim-dm	chord	default calls	1631	0.0503	0.5223	31

@@ -1,79 +1,79 @@
-tool_a	tool_b	median_diff	wins_a	wins_b	p	cliffs_delta	magnitude	p_holm	significant
-bcds	libsize	0.158	16	0	3.052e-05	0.6875	large	0.00238	True
-chord	libsize	0.1011	16	0	3.052e-05	0.5625	large	0.00238	True
-hybrid	ngenes	0.1558	16	0	3.052e-05	0.5859	large	0.00238	True
-hybrid	libsize	0.1693	16	0	3.052e-05	0.6875	large	0.00238	True
-doubletdetection	ngenes	0.1864	16	0	3.052e-05	0.6797	large	0.00238	True
-doubletdetection	libsize	0.2039	16	0	3.052e-05	0.7656	large	0.00238	True
-dbldensity	libsize	0.2051	16	0	3.052e-05	0.7422	large	0.00238	True
-dbldensity	ngenes	0.192	16	0	3.052e-05	0.6875	large	0.00238	True
-ngenes	scdblfinder	-0.2033	0	16	3.052e-05	-0.7734	large	0.00238	True
-libsize	vaeda	-0.2492	0	16	3.052e-05	-0.8047	large	0.00238	True
-ngenes	solo	-0.1573	0	16	3.052e-05	-0.5938	large	0.00238	True
-ngenes	vaeda	-0.206	0	16	3.052e-05	-0.7422	large	0.00238	True
-libsize	solo	-0.1704	0	16	3.052e-05	-0.6797	large	0.00238	True
-libsize	scdblfinder	-0.2405	0	16	3.052e-05	-0.8047	large	0.00238	True
-bcds	scdblfinder	-0.08523	1	15	6.104e-05	-0.2969	small	0.003906	True
-bcds	ngenes	0.1449	15	1	6.104e-05	0.6016	large	0.003906	True
-cxds	libsize	0.1194	15	1	9.155e-05	0.5781	large	0.005676	True
-libsize	scrublet	-0.1212	2	14	0.0001526	-0.5859	large	0.009308	True
-dbldensity	scrublet	0.08675	15	1	0.0001526	0.2578	small	0.009308	True
-bcds	vaeda	-0.06217	1	15	0.0002136	-0.2812	small	0.0126	True
-cxds	ngenes	0.1068	14	2	0.0002136	0.4531	medium	0.0126	True
-ngenes	scrublet	-0.1226	3	13	0.0004272	-0.4766	large	0.02435	True
-doubletdetection	doubletfinder	0.09285	14	2	0.0004272	0.4531	medium	0.02435	True
-doubletdetection	scrublet	0.06635	14	2	0.0004272	0.25	small	0.02435	True
-scrublet	vaeda	-0.09504	2	14	0.0005798	-0.3281	small	0.03131	True
-scdblfinder	scrublet	0.0925	13	3	0.0007629	0.3438	medium	0.04044	True
-cxds	doubletdetection	-0.06152	2	14	0.001007	-0.2891	small	0.05237	False
-chord	vaeda	-0.1011	2	14	0.001007	-0.4531	medium	0.05237	False
-dbldensity	doubletfinder	0.08499	14	2	0.001312	0.4609	medium	0.06561	False
-chord	dbldensity	-0.07537	3	13	0.001312	-0.3281	small	0.06561	False
-hybrid	scrublet	0.03803	15	1	0.001678	0.2031	small	0.08057	False
-doubletfinder	vaeda	-0.1373	3	13	0.001678	-0.5312	large	0.08057	False
-chord	scdblfinder	-0.09758	3	13	0.002136	-0.4688	medium	0.09827	False
-cxds	dbldensity	-0.06836	3	13	0.002686	-0.2656	small	0.1208	False
-chord	ngenes	0.1063	13	3	0.002686	0.4141	medium	0.1208	False
-doubletfinder	scdblfinder	-0.139	3	13	0.002686	-0.5391	large	0.1208	False
-cxds	hybrid	-0.05594	4	12	0.003357	-0.2344	small	0.141	False
-scdblfinder	solo	0.06064	12	4	0.003357	0.25	small	0.141	False
-cxds	vaeda	-0.07076	3	13	0.003357	-0.3281	small	0.141	False
-chord	doubletdetection	-0.05835	4	12	0.003357	-0.293	small	0.141	False
-doubletfinder	hybrid	-0.04191	2	14	0.004181	-0.3672	medium	0.1589	False
-cxds	scdblfinder	-0.08838	3	13	0.005157	-0.3672	medium	0.1908	False
-hybrid	scdblfinder	-0.03357	4	12	0.009186	-0.2266	small	0.3307	False
-chord	hybrid	-0.04067	5	11	0.009186	-0.2188	small	0.3307	False
-doubletfinder	libsize	0.07588	12	4	0.0155	0.4531	medium	0.5271	False
-libsize	ngenes	-0.01773	3	13	0.0155	-0.1172	negligible	0.5271	False
-solo	vaeda	-0.03731	4	12	0.01825	-0.1953	small	0.584	False
-hybrid	vaeda	-0.03215	3	13	0.01825	-0.2188	small	0.584	False
-doubletdetection	scdblfinder	-0.02686	4	12	0.02496	-0.1484	small	0.7489	False
-dbldensity	hybrid	0.02138	11	5	0.03864	0.09375	negligible	1	False
-doubletdetection	vaeda	-0.03124	3	13	0.05768	-0.1562	small	1	False
-bcds	dbldensity	-0.01477	6	10	0.07391	-0.125	negligible	1	False
-doubletfinder	ngenes	0.07433	10	6	0.08325	0.2891	small	1	False
-doubletdetection	hybrid	0.01242	11	5	0.1167	0.07031	negligible	1	False
-chord	doubletfinder	0.03404	12	4	0.1297	0.2031	small	1	False
-bcds	doubletdetection	-0.01136	7	9	0.1439	-0.05469	negligible	1	False
-dbldensity	scdblfinder	-0.0117	7	9	0.1591	-0.1094	negligible	1	False
-dbldensity	solo	0.01482	9	7	0.1754	0.1094	negligible	1	False
-scdblfinder	vaeda	0.01526	10	6	0.1754	0.03906	negligible	1	False
-dbldensity	vaeda	-0.009567	7	9	0.2312	-0.1016	negligible	1	False
-bcds	doubletfinder	0.0765	12	4	0.2522	0.3672	medium	1	False
-bcds	chord	0.03657	11	5	0.2744	0.2344	small	1	False
-chord	solo	-0.05326	5	11	0.2744	-0.2266	small	1	False
-doubletfinder	solo	-0.05595	4	12	0.2979	-0.3281	small	1	False
-cxds	solo	-0.07217	5	11	0.3484	-0.1953	small	1	False
-cxds	doubletfinder	0.009831	9	7	0.3484	0.1484	small	1	False
-doubletfinder	scrublet	-0.01818	6	10	0.3755	-0.1562	small	1	False
-doubletdetection	solo	-0.003875	7	9	0.4332	0.02344	negligible	1	False
-bcds	cxds	0.04355	11	5	0.4637	0.2188	small	1	False
-bcds	scrublet	0.04956	11	5	0.4637	0.2031	small	1	False
-scrublet	solo	-0.06666	6	10	0.4954	-0.1562	small	1	False
-bcds	hybrid	-0.005936	8	8	0.5619	-0.03125	negligible	1	False
-dbldensity	doubletdetection	0.003319	8	8	0.7057	0.02344	negligible	1	False
-chord	scrublet	0.01843	11	5	0.7436	-0.01562	negligible	1	False
-chord	cxds	0.00904	10	6	0.8209	0.02344	negligible	1	False
-bcds	solo	-0.001626	8	8	0.8209	-0.03125	negligible	1	False
-hybrid	solo	-0.01536	6	10	0.9799	-0.03125	negligible	1	False
-cxds	scrublet	0.008174	10	6	0.9799	-0.007812	negligible	1	False
+tool_a	tool_b	median_diff	median_diff_lo	median_diff_hi	rank_biserial	wins_a	wins_b	p	cliffs_delta	magnitude	p_holm	significant
+bcds	libsize	0.158	0.14	0.2728	1	16	0	3.052e-05	0.6875	large	0.00238	True
+chord	libsize	0.1011	0.04743	0.1777	1	16	0	3.052e-05	0.5625	large	0.00238	True
+hybrid	ngenes	0.1558	0.1228	0.2194	1	16	0	3.052e-05	0.5859	large	0.00238	True
+hybrid	libsize	0.1693	0.1299	0.2744	1	16	0	3.052e-05	0.6875	large	0.00238	True
+doubletdetection	ngenes	0.1864	0.1148	0.2505	1	16	0	3.052e-05	0.6797	large	0.00238	True
+doubletdetection	libsize	0.2039	0.1508	0.2833	1	16	0	3.052e-05	0.7656	large	0.00238	True
+dbldensity	libsize	0.2051	0.1357	0.2868	1	16	0	3.052e-05	0.7422	large	0.00238	True
+dbldensity	ngenes	0.192	0.1245	0.2513	1	16	0	3.052e-05	0.6875	large	0.00238	True
+ngenes	scdblfinder	-0.2033	-0.3241	-0.1401	-1	0	16	3.052e-05	-0.7734	large	0.00238	True
+libsize	vaeda	-0.2492	-0.3333	-0.1529	-1	0	16	3.052e-05	-0.8047	large	0.00238	True
+ngenes	solo	-0.1573	-0.2316	-0.1	-1	0	16	3.052e-05	-0.5938	large	0.00238	True
+ngenes	vaeda	-0.206	-0.298	-0.1417	-1	0	16	3.052e-05	-0.7422	large	0.00238	True
+libsize	solo	-0.1704	-0.277	-0.1329	-1	0	16	3.052e-05	-0.6797	large	0.00238	True
+libsize	scdblfinder	-0.2405	-0.3788	-0.166	-1	0	16	3.052e-05	-0.8047	large	0.00238	True
+bcds	scdblfinder	-0.08523	-0.1019	-0.02397	-0.9853	1	15	6.104e-05	-0.2969	small	0.003906	True
+bcds	ngenes	0.1449	0.1035	0.2367	0.9853	15	1	6.104e-05	0.6016	large	0.003906	True
+cxds	libsize	0.1194	0.07328	0.1712	0.9706	15	1	9.155e-05	0.5781	large	0.005676	True
+libsize	scrublet	-0.1212	-0.2523	-0.07897	-0.9559	2	14	0.0001526	-0.5859	large	0.009308	True
+dbldensity	scrublet	0.08675	0.03841	0.09719	0.9559	15	1	0.0001526	0.2578	small	0.009308	True
+bcds	vaeda	-0.06217	-0.09643	-0.02554	-0.9412	1	15	0.0002136	-0.2812	small	0.0126	True
+cxds	ngenes	0.1068	0.06485	0.1304	0.9412	14	2	0.0002136	0.4531	medium	0.0126	True
+ngenes	scrublet	-0.1226	-0.1758	-0.06812	-0.9118	3	13	0.0004272	-0.4766	large	0.02435	True
+doubletdetection	doubletfinder	0.09285	0.01351	0.1398	0.9118	14	2	0.0004272	0.4531	medium	0.02435	True
+doubletdetection	scrublet	0.06635	0.03277	0.09851	0.9118	14	2	0.0004272	0.25	small	0.02435	True
+scrublet	vaeda	-0.09504	-0.1307	-0.03293	-0.8971	2	14	0.0005798	-0.3281	small	0.03131	True
+scdblfinder	scrublet	0.0925	0.03485	0.1384	0.8824	13	3	0.0007629	0.3438	medium	0.04044	True
+cxds	doubletdetection	-0.06152	-0.1347	-0.008148	-0.8676	2	14	0.001007	-0.2891	small	0.05237	False
+chord	vaeda	-0.1011	-0.1333	-0.04318	-0.8676	2	14	0.001007	-0.4531	medium	0.05237	False
+dbldensity	doubletfinder	0.08499	0.02609	0.1695	0.8529	14	2	0.001312	0.4609	medium	0.06561	False
+chord	dbldensity	-0.07537	-0.08724	-0.03835	-0.8529	3	13	0.001312	-0.3281	small	0.06561	False
+hybrid	scrublet	0.03803	0.02362	0.09327	0.8382	15	1	0.001678	0.2031	small	0.08057	False
+doubletfinder	vaeda	-0.1373	-0.1867	-0.03958	-0.8382	3	13	0.001678	-0.5312	large	0.08057	False
+chord	scdblfinder	-0.09758	-0.165	-0.04044	-0.8235	3	13	0.002136	-0.4688	medium	0.09827	False
+cxds	dbldensity	-0.06836	-0.1441	-0.02625	-0.8088	3	13	0.002686	-0.2656	small	0.1208	False
+chord	ngenes	0.1063	0.01848	0.167	0.8088	13	3	0.002686	0.4141	medium	0.1208	False
+doubletfinder	scdblfinder	-0.139	-0.2088	-0.019	-0.8088	3	13	0.002686	-0.5391	large	0.1208	False
+cxds	hybrid	-0.05594	-0.08537	-0.01614	-0.7941	4	12	0.003357	-0.2344	small	0.141	False
+scdblfinder	solo	0.06064	0.0147	0.1442	0.7941	12	4	0.003357	0.25	small	0.141	False
+cxds	vaeda	-0.07076	-0.1667	-0.03247	-0.7941	3	13	0.003357	-0.3281	small	0.141	False
+chord	doubletdetection	-0.05835	-0.1176	-3.563e-05	-0.7941	4	12	0.003357	-0.293	small	0.141	False
+doubletfinder	hybrid	-0.04191	-0.1453	-0.01665	-0.7794	2	14	0.004181	-0.3672	medium	0.1589	False
+cxds	scdblfinder	-0.08838	-0.1867	-0.02086	-0.7647	3	13	0.005157	-0.3672	medium	0.1908	False
+hybrid	scdblfinder	-0.03357	-0.0989	-0.00235	-0.7206	4	12	0.009186	-0.2266	small	0.3307	False
+chord	hybrid	-0.04067	-0.08075	0.005745	-0.7206	5	11	0.009186	-0.2188	small	0.3307	False
+doubletfinder	libsize	0.07588	0.01971	0.1929	0.6765	12	4	0.0155	0.4531	medium	0.5271	False
+libsize	ngenes	-0.01773	-0.05846	-0.005829	-0.6765	3	13	0.0155	-0.1172	negligible	0.5271	False
+solo	vaeda	-0.03731	-0.1042	-0.0003906	-0.6618	4	12	0.01825	-0.1953	small	0.584	False
+hybrid	vaeda	-0.03215	-0.07534	-0.01204	-0.6618	3	13	0.01825	-0.2188	small	0.584	False
+doubletdetection	scdblfinder	-0.02686	-0.076	-0.006738	-0.6324	4	12	0.02496	-0.1484	small	0.7489	False
+dbldensity	hybrid	0.02138	-0.0003264	0.04674	0.5882	11	5	0.03864	0.09375	negligible	1	False
+doubletdetection	vaeda	-0.03124	-0.05	-0.004396	-0.5441	3	13	0.05768	-0.1562	small	1	False
+bcds	dbldensity	-0.01477	-0.09897	0.01131	-0.5147	6	10	0.07391	-0.125	negligible	1	False
+doubletfinder	ngenes	0.07433	-0.03847	0.1962	0.5	10	6	0.08325	0.2891	small	1	False
+doubletdetection	hybrid	0.01242	-0.007992	0.04506	0.4559	11	5	0.1167	0.07031	negligible	1	False
+chord	doubletfinder	0.03404	0.007279	0.05914	0.4412	12	4	0.1297	0.2031	small	1	False
+bcds	doubletdetection	-0.01136	-0.1115	0.00471	-0.4265	7	9	0.1439	-0.05469	negligible	1	False
+dbldensity	scdblfinder	-0.0117	-0.04471	0.006748	-0.4118	7	9	0.1591	-0.1094	negligible	1	False
+dbldensity	solo	0.01482	-0.0224	0.09222	0.3971	9	7	0.1754	0.1094	negligible	1	False
+scdblfinder	vaeda	0.01526	-0.01077	0.02607	0.3971	10	6	0.1754	0.03906	negligible	1	False
+dbldensity	vaeda	-0.009567	-0.03016	0.006192	-0.3529	7	9	0.2312	-0.1016	negligible	1	False
+bcds	doubletfinder	0.0765	-0.04815	0.1808	0.3382	12	4	0.2522	0.3672	medium	1	False
+bcds	chord	0.03657	-0.02764	0.09904	0.3235	11	5	0.2744	0.2344	small	1	False
+chord	solo	-0.05326	-0.1132	0.01889	-0.3235	5	11	0.2744	-0.2266	small	1	False
+doubletfinder	solo	-0.05595	-0.2067	0.02187	-0.3088	4	12	0.2979	-0.3281	small	1	False
+cxds	solo	-0.07217	-0.1324	0.02934	-0.2794	5	11	0.3484	-0.1953	small	1	False
+cxds	doubletfinder	0.009831	-0.0312	0.08936	0.2794	9	7	0.3484	0.1484	small	1	False
+doubletfinder	scrublet	-0.01818	-0.06474	0.02917	-0.2647	6	10	0.3755	-0.1562	small	1	False
+doubletdetection	solo	-0.003875	-0.0163	0.07725	0.2353	7	9	0.4332	0.02344	negligible	1	False
+bcds	cxds	0.04355	-0.02836	0.1295	0.2206	11	5	0.4637	0.2188	small	1	False
+bcds	scrublet	0.04956	-0.05416	0.09186	0.2206	11	5	0.4637	0.2031	small	1	False
+scrublet	solo	-0.06666	-0.1101	0.03806	-0.2059	6	10	0.4954	-0.1562	small	1	False
+bcds	hybrid	-0.005936	-0.04577	0.03502	-0.1765	8	8	0.5619	-0.03125	negligible	1	False
+dbldensity	doubletdetection	0.003319	-0.01856	0.03484	0.1176	8	8	0.7057	0.02344	negligible	1	False
+chord	scrublet	0.01843	-0.03448	0.04914	0.1029	11	5	0.7436	-0.01562	negligible	1	False
+chord	cxds	0.00904	-0.07337	0.05579	-0.07353	10	6	0.8209	0.02344	negligible	1	False
+bcds	solo	-0.001626	-0.02872	0.02119	-0.07353	8	8	0.8209	-0.03125	negligible	1	False
+hybrid	solo	-0.01536	-0.03636	0.0386	0.01471	6	10	0.9799	-0.03125	negligible	1	False
+cxds	scrublet	0.008174	-0.04088	0.03889	0.01471	10	6	0.9799	-0.007812	negligible	1	False

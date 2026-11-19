@@ -1,3 +1,6 @@
 metric	chi2	df	p	n_datasets	n_tools
 auprc	103.3	12	1.229e-16	16	13
 auroc	88.15	12	1.123e-13	16	13
+f1_default	36.63	9	3.066e-05	16	10
+auprc (study-averaged)	58.97	12	3.469e-08	9	13
+auroc (study-averaged)	57.86	12	5.524e-08	9	13

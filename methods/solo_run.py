@@ -1,6 +1,8 @@
 """Solo via scvi-tools (the original calico/Solo repo is deprecated in favor of scvi.external.SOLO).
 Follows the scvi-tools doublet tutorial: 2000 HVGs (seurat_v3 on counts) -> SCVI -> SOLO.
-score = P(doublet) (soft prediction); call = SOLO's hard prediction. No expected-rate input."""
+score = P(doublet) (soft prediction); call = SOLO's hard prediction. No expected-rate input.
+SOLO_NHVG env var (sensitivity analysis only): number of HVGs, 0 = all genes."""
+import os
 import numpy as np
 import anndata as ad
 import scanpy as sc
@@ -15,7 +17,9 @@ scvi.settings.seed = args.seed
 adata = ad.AnnData(X.astype(np.float32))
 adata.obs_names, adata.var_names = barcodes, genes
 adata.var_names_make_unique()
-sc.pp.highly_variable_genes(adata, n_top_genes=2000, flavor="seurat_v3", subset=True)
+nhvg = int(os.environ.get("SOLO_NHVG", 2000))
+if nhvg:
+    sc.pp.highly_variable_genes(adata, n_top_genes=nhvg, flavor="seurat_v3", subset=True)
 
 scvi.model.SCVI.setup_anndata(adata)
 vae = scvi.model.SCVI(adata)

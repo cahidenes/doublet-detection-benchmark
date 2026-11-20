@@ -42,7 +42,7 @@ Further findings:
 - **Agreement with Xi & Li.** Six of the eight directly comparable tools reproduce their
   per-dataset AUPRC closely.
   DoubletFinder is 0.12 lower than in their study; its automatic pK choice explains about half of
-  that, and a fixed pK of 0.01 beats the automatic choice on all 36 independent datasets. The current scvi-tools Solo is much worse than the original on the species mixtures.
+  that, and a fixed pK of 0.01 beats the automatic choice on all 36 independent datasets. Solo's gap is the move to scvi-tools: the original package, run here, matches Xi & Li (0.495 vs 0.502), while the scvi-tools version loses 0.4 on the species mixtures and gains on the pbmc-1 lanes.
 - **Labels.** Same-species doublets in the species mixtures are labeled as singlets. This
   penalizes the tools that find them (Solo, bcds) and is not neutral between tools.
 - **Ensembles** of the top tools do not beat scDblFinder once the combination is chosen without
@@ -661,7 +661,25 @@ HVGs: 0.54/0.56; 2,000 HVGs: 0.56/0.60), and AUROC stays at 0.95–0.99. The scv
 ranks the unlabeled high-RNA droplets above the cross-species doublets, while the original
 apparently did not.
 
-<!-- SECTION:SOLO_ORIGINAL -->
+**The original Solo reproduces Xi & Li; the gap is the reimplementation.** We ran the original
+package (solo-sc 0.6 on scvi 0.6.8, the repository's example parameters, all genes; only torch
+is newer) on all 16 datasets ([data.md §26](data.md#26-original-solo-solo-sc-06)):
+
+| | Mean AUPRC | hm-12k | hm-6k | pbmc-1A/1B/1C-dm |
+|---|--:|--:|--:|--:|
+| Xi & Li (2021) | 0.502 | 0.995 | 0.972 | 0.24 / 0.12 / 0.35 |
+| original Solo, here | 0.495 | 0.941 | 0.967 | 0.22 / 0.16 / 0.31 |
+| scvi-tools Solo (main run) | 0.469 | 0.558 | 0.605 | 0.38 / 0.21 / 0.48 |
+
+The original matches Xi & Li to within 0.023 AUPRC on average (largest difference 0.054, on
+hm-12k; the original CLI has no seed option, so single runs vary by about this much). It
+reproduces both the high species-mix values and the low pbmc-1A/B/C values. The data, the labels
+and our preprocessing are therefore not the cause; the scvi-tools version scores differently.
+Its mean is only 0.03 lower, because it loses on the species mixtures and gains on the
+pbmc-1 lanes. Both versions train on the same counts, so the cause lies inside the
+reimplementation (model, doublet simulation or training defaults), which we did not isolate
+further. The ranking of the main benchmark uses the current scvi-tools version, which is
+what users install today.
 
 ### 3.13 Lineage co-expression (PBMC data)
 
@@ -699,7 +717,8 @@ super-loaded or hashed experiments (rates up to 37% here). scDblFinder's prior-b
 rate is the robust design.
 
 **Comparison with Xi & Li (2021).** Most tools reproduce. Two rankings changed: DoubletFinder
-fell from second to ninth, and Solo's results changed in its move to scvi-tools. A benchmark can
+fell from second to ninth, and Solo's results changed in its move to scvi-tools (the original
+package, run on our data, still reproduces Xi & Li). A benchmark can
 therefore only rank tool *versions*, and re-running old benchmarks on current versions is
 worthwhile. The xgboost-dependent tools (bcds, hybrid, Chord, scDblFinder) also show that a
 dependency change can break a tool or shift its scores without any change to the tool.
@@ -776,7 +795,8 @@ scripts/run_final.sh              # -> results/{heuristic,sim,singletcode,sim_ro
 # 6. Sensitivity analyses: DoubletFinder pK on the 16 datasets (~1.5 h) and on singletCode (~2 h)
 analysis/df_pk_sensitivity.sh
 DATASETS="$(ls data/processed | grep ^sim-wm-)" PKS="0.005 0.01" TAG=_singletcode analysis/df_pk_sensitivity.sh
-#    Original Solo (separate env, see analysis/solo_original.py)
+#    Original Solo on the 16 datasets, GPU, ~10 min each (env dbl-solo0g, see its docstring)
+~/miniforge3/envs/dbl-solo0g/bin/python analysis/solo_original.py $(ls data/processed | grep -v -e "^scale-" -e "^sim-" -e "^sc-" -e "^wm-")
 
 # 7. All statistics, figures and report/data.md (downstream.py alone takes ~10 min)
 analysis/run_all.sh

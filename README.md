@@ -240,8 +240,10 @@ data/, logs/         generated, not tracked in git
       (within 0.005 mean AUPRC for scds, Scrublet, scDblFinder). DoubletFinder's gap (0.42 vs
       0.54) is about half pK: BCmvn's choice (logged for all 16 datasets) costs 0.06, and the
       best fixed pK per dataset still stays 0.05 below. The pK claim in the report was softened
-      accordingly. Solo's gap on the species mixtures is not the HVG choice; see the original
-      Solo run (report §3.12).
+      accordingly. Solo's gap is the reimplementation: the original package (solo-sc 0.6), run on
+      all 16 datasets, matches Xi & Li (mean 0.495 vs 0.502; hm-12k/hm-6k 0.94/0.97), while
+      scvi-tools Solo reaches 0.56/0.60 there (report §3.12). The cause inside scvi-tools was
+      not isolated.
 - [x] **Realistic expected-rate setting.** With the 10x guideline, scDblFinder's F1 is
       unchanged (0.49 → 0.50); DoubletFinder (0.37 → 0.32), Chord and Scrublet lose. The
       labeled rate flattered them, not scDblFinder (report §3.3).

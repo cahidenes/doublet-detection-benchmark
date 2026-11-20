@@ -1,0 +1,3 @@
+dataset	auprc_original	auroc_original	auprc_scvitools	auprc_xili	d_original_vs_xili
+hm-6k	0.9665	0.9993	0.6047	0.9719	-0.0054
+mean	0.9665	0.9993	0.6047	0.9719	-0.0054

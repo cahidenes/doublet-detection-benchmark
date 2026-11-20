@@ -89,3 +89,24 @@ fig.suptitle("Independent validation: singletCode singlets (Watermelon T47D) + s
              x=0.01, ha="left", fontsize=10)
 fig.tight_layout(rect=(0, 0, 1, 0.92))
 fig.savefig(FIG / "singletcode.png", dpi=200)
+
+# Comparison with Zhang et al. (2024) on the same 6 Watermelon samples. They benchmarked 4 tools
+# with *averaged* doublets (singlet-like library, cf. our f = 0.5) at several doublet rates;
+# their per-sample AUPRC/AUROC: figshare 25478680, plotData/benchmarking/barcodedAllForPlot.csv.
+zf = ROOT / "data/raw/singletcode/plotData/benchmarking/barcodedAllForPlot.csv"
+if zf.exists():
+    z = pd.read_csv(zf)
+    z = z[z.dataset == "watermelon"]
+    zmap = {"scDblFinder": "scdblfinder", "Scrublet": "scrublet", "DoubletFinder": "doubletfinder",
+            "hybrid": "hybrid"}
+    z["tool"] = z.condition.map(zmap)
+    zz = z.groupby("tool")[["auprc", "auroc"]].mean().add_prefix("zhang_")
+    # chance-level AUPRC differs (their actual rates 0.05-0.20, ours 0.10): also report AUPRC / rate
+    zz["zhang_auprc_over_rate"] = z.assign(r=z.auprc / z.dbl_act).groupby("tool").r.mean()
+    for sc_ in ("random, f=0.5", "random, f=1"):
+        g = s[s.scenario == sc_].groupby("tool")
+        zz[f"ours_auprc_{sc_}"] = g.auprc.mean()
+        zz[f"ours_auroc_{sc_}"] = g.auroc.mean()
+    zz["ours_auprc_over_rate_random, f=0.5"] = zz["ours_auprc_random, f=0.5"] / 0.10
+    zz.to_csv(STATS / "singletcode_vs_zhang.tsv", sep="\t", float_format="%.4f")
+    print("\nZhang et al. (2024), Watermelon, averaged doublets vs ours:\n", zz.round(3).to_string())

@@ -60,7 +60,8 @@ out = ["# Report data",
        "17. [Raw files](#17-raw-files) · 18. [Paired effect sizes and F1 statistics](#18-paired-effect-sizes-and-f1-statistics) · "
        "19. [Label noise](#19-label-noise-species-mixtures) · 20. [Lineage co-expression](#20-lineage-co-expression) · "
        "21. [Ensembles](#21-ensembles) · 22. [Xi & Li comparison](#22-comparison-with-xi--li-2021) · "
-       "23. [Realistic expected rate](#23-realistic-expected-rate) · 24. [singletCode](#24-singletcode-independent-validation)", ""]
+       "23. [Realistic expected rate](#23-realistic-expected-rate) · 24. [singletCode](#24-singletcode-independent-validation) · "
+       "25. [Label-free pK](#25-label-free-pk-rule-for-doubletfinder-singletcode) · 26. [Original Solo](#26-original-solo-solo-sc-06)", ""]
 
 # 1 datasets
 ds = d.groupby("dataset").agg(droplets=("n", "first"), rate=("true_rate", "first")).loc[DS]
@@ -354,6 +355,36 @@ if (STATS / "singletcode_auprc.tsv").exists():
             "Watermelon-barcoded T47D samples; doublets simulated from them at rate 0.10. Mean AUPRC "
             "over the 6 samples.", "", md(sca), "", "### Statistics per scenario (blocks = 6 samples)", "",
             md(scs, "{:.3g}", index=False), ""]
+    if (STATS / "singletcode_vs_zhang.tsv").exists():
+        zz = _named(pd.read_csv(STATS / "singletcode_vs_zhang.tsv", sep="\t", index_col=0))
+        out += ["### Comparison with Zhang et al. (2024) on the same samples", "",
+                "Zhang et al. benchmarked 4 tools on these 6 samples with *averaged* doublets (singlet-like "
+                "library) at actual doublet rates 0.05–0.20; values are their per-sample means "
+                "(`plotData/benchmarking/barcodedAllForPlot.csv`). AUPRC ÷ rate corrects for the different "
+                "chance levels.", "", md(zz), ""]
+pk_sc = ROOT / "results/sensitivity/df_pk_singletcode.tsv"
+if pk_sc.exists():
+    p = pd.read_csv(pk_sc, sep="\t")
+    p["scenario"] = p.dataset.str.extract(r"-(random|homotypic|heteroweighted)-f([\d.]+)$").agg(", f=".join, axis=1)
+    sm = pd.read_csv(R / "singletcode_metrics.tsv", sep="\t")
+    sm = sm[(sm.tool == "doubletfinder") & (sm.status == "ok")][["dataset", "auprc"]].assign(pK="BCmvn")
+    p = pd.concat([p[["dataset", "pK", "auprc"]].assign(pK=lambda x: "pK = " + x.pK.astype(str)), sm])
+    p["scenario"] = p.dataset.str.extract(r"-(random|homotypic|heteroweighted)-f([\d.]+)$").agg(", f=".join, axis=1)
+    pt = p.pivot_table(index="scenario", columns="pK", values="auprc")
+    pt.loc["overall"] = p.pivot_table(index="dataset", columns="pK", values="auprc").mean()
+    w = p.pivot_table(index="dataset", columns="pK", values="auprc")
+    out += ["## 25. Label-free pK rule for DoubletFinder (singletCode)", "",
+            "Fixed small pK (the best fixed values on the 16 real datasets) against the automatic BCmvn "
+            "choice on the 36 singletCode datasets, which played no part in choosing the rule. Mean AUPRC.", "",
+            md(pt), "",
+            "Datasets where the fixed pK beats BCmvn: " + ", ".join(
+                f"{c}: {int((w[c] > w['BCmvn']).sum())}/{len(w)}" for c in w.columns if c != "BCmvn"), ""]
+solo0 = STATS / "solo_original.tsv"
+if solo0.exists():
+    out += ["## 26. Original Solo (solo-sc 0.6)", "",
+            "The original Solo package as Xi & Li ran it, against the scvi-tools reimplementation used in the "
+            "main run, on the same matrices (`analysis/solo_original.py`).", "",
+            md(pd.read_csv(solo0, sep="\t"), index=False), ""]
 
 (ROOT / "report").mkdir(exist_ok=True)
 (ROOT / "report/data.md").write_text("\n".join(out))

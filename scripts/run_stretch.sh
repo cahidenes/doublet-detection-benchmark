@@ -6,7 +6,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 SMK=(~/miniforge3/envs/dbl-py/bin/snakemake -s workflow/Snakefile --cores 8
      --resources gpu=1 heavy=1 --keep-going)
-SIM=$(ls -d data/processed/sim-* | xargs -n1 basename | paste -sd,)
+SIM=$(ls -d data/processed/sim-{pbmc-2ctrl-dm,pdx-MULTI}-* | xargs -n1 basename | paste -sd,)
 "${SMK[@]}" --config "datasets=[$SIM]" 'rate_multipliers=[1.0]' metrics_out=results/sim_metrics.tsv \
     > logs/sim_run.log 2>&1
 echo "sim exit $?"; tail -2 logs/sim_run.log

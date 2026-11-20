@@ -39,8 +39,24 @@ MULTI-seq or species mixing.
 | MULTI-seq | `pdx-MULTI`, `HMEC-orig-MULTI`, `HMEC-rep-MULTI`, `HEK-HMEC-MULTI`, `nuc-MULTI` |
 
 These range from 500 to 26,426 droplets, with doublet rates of 2.5–37.3%. Droplet counts and
-rates were checked against the proposal after download. Simulated data (2.7 GB) is optional:
-`scripts/download_data.sh --with-sim`.
+rates were checked against the proposal after download. Xi & Li's own simulated data (2.7 GB)
+is not used: `scripts/download_data.sh --with-sim`.
+
+**Simulated doublets** (`scripts/simulate_doublets.py`): synthetic doublets made from the
+labeled singlets of `pbmc-2ctrl-dm` and `pdx-MULTI` (random, homotypic, heterotypic and
+abundance-weighted heterotypic pairing; summed or singlet-depth library; 3 draws).
+
+**Independent validation: singletCode** (Zhang et al. 2024, figshare
+[25478680](https://figshare.com/articles/dataset/25478680)). Six Watermelon-barcoded T47D
+samples whose true singlets were identified from lineage barcodes. No tool was tuned on them.
+`scripts/download_data.sh --with-singletcode` fetches them (5.5 GB zip; about 0.7 GB is kept,
+and the zip can be deleted afterwards). `scripts/prepare_singletcode.py` writes the
+singlets-only bases `data/processed/wm-T47D-*`, and `simulate_doublets.py` adds the doublets
+(`sim-wm-*`, 36 datasets).
+
+**Reference results:** Xi & Li's per-dataset AUPRC/AUROC (Zenodo 4444303, `result.xlsx`,
+downloaded by default) → `results/reference/xili2021_real.tsv`
+(`scripts/prepare_xili_reference.py`).
 
 ## Setup
 
@@ -101,7 +117,21 @@ $SMK --cores 8 --config only_tools='[chord,vaeda]'   # subset of tools
   11 GB on only 6.8k droplets. Keep `--cores` low enough that two of these jobs fit in memory
   together (each job uses 4 threads).
 - Seeds, the rate multipliers for robustness (`[0.5, 1.0, 2.0]`) and the dataset list are set
-  in `config/config.yaml`.
+  in `config/config.yaml`. The multiplier `h` gives the rate-taking tools the 10x loading
+  guideline (0.8% per 1,000 droplets) instead of the labeled rate.
+
+Beyond the main run, the experiments write separate metrics files (`results/metrics.tsv` is
+never touched):
+
+| Script | Runs | Output |
+|---|---|---|
+| `scripts/run_stretch.sh` | seeds 1–2 for every tool with randomness | `results/stability_metrics.tsv` |
+| `scripts/run_final.sh` | realistic rate (`h`); simulated doublets; singletCode; 0.5×/1×/2× on simulations | `results/{heuristic,sim,singletcode,sim_robustness}_metrics.tsv` |
+| `analysis/df_pk_sensitivity.sh` | DoubletFinder with fixed pK (options `DATASETS`, `PKS`, `TAG`) | `results/sensitivity/df_pk*.tsv` |
+| `analysis/solo_original.py` | the original Solo (solo-sc 0.6), in its own env `dbl-solo0g` (setup in the docstring) | `results/sensitivity/solo0/` |
+
+`run_final.sh` passes `--rerun-incomplete`, so it can simply be restarted after an
+interruption (run `snakemake --unlock` first if a crash left a lock).
 
 ### Output schema
 
@@ -134,20 +164,28 @@ Several tools no longer work with current versions of their dependencies. Tool s
 Note: scDblFinder also uses xgboost, and its scores changed slightly between xgboost 3.4.2 and
 2.1.4. Always report the versions you used.
 
+**Evidence that the shims preserve each tool's behaviour.** On the same 16 datasets, bcds,
+hybrid and cxds reproduce Xi & Li's (2021) per-dataset AUPRC to within 0.005 on average
+(per-dataset Spearman 0.98–1.00), and so does scDblFinder (report §3.12). Chord has no earlier
+reference; its components (cxds, bcds, DoubletFinder) are checked individually, and its
+inverted scores on some datasets come from its own training design, not from a shim
+(report §3.10).
+
 ## Repository layout
 
 ```
 config/config.yaml   tools, interpreters, datasets, seeds, rate multipliers
 envs/                conda env files + pinned GitHub installs; envs/lock/ = exact versions used
 analysis/            statistics and figures (run_all.sh rebuilds everything)
-report/              report draft (report.md) and every number behind it (data.md)
+report/              final report (report.md) and every number behind it (data.md)
 methods/             one wrapper per tool; common.py / common.R hold the shared I/O
 scripts/             download_data.sh, convert_rds.R, evaluate.py, subsample.py,
-                     simulate_doublets.py, run_stretch.sh (simulation + seed runs)
+                     simulate_doublets.py, prepare_singletcode.py, prepare_xili_reference.py,
+                     run_stretch.sh (seeds), run_final.sh (final-report runs)
 workflow/Snakefile   the pipeline
 docs/                proposal, usability log (metric 10)
-results/             metrics.tsv, {scaling,sim,stability,downstream}_metrics.tsv, stats/,
-                     figures/, bench/ are tracked; pred/ and eval/ are not
+results/             *_metrics.tsv, stats/, figures/, bench/, sensitivity/, reference/ are
+                     tracked; pred/ and eval/ are not
 data/, logs/         generated, not tracked in git
 ```
 
@@ -161,83 +199,84 @@ data/, logs/         generated, not tracked in git
    tool should reach AUROC above 0.98).
 4. Record install and run problems in `docs/usability_log.md`.
 
-## Status (2026-11-11)
+## Status (2026-11-20)
 
 - [x] Environments, data download and conversion (all 16 datasets)
-- [x] Wrappers for all 13 methods; smoke test passes on `J293t-dm`, `hm-6k`, `pbmc-1A-dm`
-- [x] Full run on all 16 datasets (208/208 ok)
-- [x] Rate robustness (0.5×/2×): `analysis/robustness.py`; DoubletFinder pK sensitivity
-- [x] Scaling with droplet number: `scripts/subsample.py`, `analysis/scaling.py`
-- [x] Tool agreement, rate estimation, usability scores, statistics: `analysis/run_all.sh`
-- [x] Independent doublet simulation from labeled singlets: `scripts/simulate_doublets.py`,
-      `analysis/simulation.py` (12 datasets, 156/156 ok)
-- [x] Statistics (Friedman + Wilcoxon/Holm, Cliff's δ), figures
-- [ ] Report: draft in [`report/report.md`](report/report.md), all numbers in [`report/data.md`](report/data.md)
+- [x] Wrappers for all 13 methods; full run on all 16 datasets (208/208 ok)
+- [x] Rate robustness (0.5×/2×) and a realistic-rate setting (10x guideline, 64/64 ok)
+- [x] Scaling with droplet number (1k–26k): `scripts/subsample.py`, `analysis/scaling.py`
+- [x] Tool agreement, rate estimation, usability scores
+- [x] Statistics: Friedman + Wilcoxon/Holm, Cliff's δ, paired effect sizes, F1 tests,
+      study-averaged sensitivity (`analysis/accuracy_stats.py`)
+- [x] Simulated doublets, 4 pairings × 2 depths × 3 draws (624/624 ok): `analysis/simulation.py`
 - [x] Stability across seeds 0–2 (320/320 ok): `analysis/stability.py`
-- [x] Downstream impact (HVGs, markers, clusters): `analysis/downstream.py`
+- [x] Downstream impact with noise-floor references: `analysis/downstream.py`
+- [x] Independent validation on singletCode (468/468 ok): `analysis/singletcode.py`
+- [x] Comparison with Xi & Li (2021) per dataset; DoubletFinder pK sweep on all 16 datasets;
+      original Solo: `analysis/xili_comparison.py`, `analysis/solo_original.py`
+- [x] Label noise, lineage co-expression, ensembles: `analysis/label_noise.py`, `lineage.py`,
+      `ensemble.py`
+- [x] Final report: [`report/report.md`](report/report.md), all numbers in [`report/data.md`](report/data.md)
+- [ ] Zenodo deposit of `results/pred/` (needed to rerun the analyses that use per-droplet
+      predictions without rerunning the tools)
+- [ ] Scaling to 100k–200k droplets (stated as a limitation)
 
-## Open issues and next steps (review, 2026-11-17)
+## Review issues (2026-11-17) and how they were resolved
 
 ### Fix first
 
-- [ ] **Independent validation of scDblFinder.** Its parameters were tuned on these 16
-      datasets, and both simulation bases (`pbmc-2ctrl-dm`, `pdx-MULTI`) are among them. Only
-      singletCode data is truly independent, which makes it the most important remaining task.
-      Until it is done, state this caveat in the abstract.
-- [ ] **Label noise is not tool-neutral.** Same-sample doublets (often homotypic) are labeled
-      singlets, and tools differ strongly on homotypic doublets (§3.8: Solo 0.53 vs Scrublet
-      0.14). Missing labels therefore penalize exactly the tools that find them. This probably
-      explains Solo's and bcds' low AUPRC on `hm-12k`/`hm-6k`, where human–human and
-      mouse–mouse doublets are labeled singlets. Test: do their top-scored "false positives"
-      have about 2× the library size of their own species? Revise the milestone 2 argument
-      accordingly.
-- [ ] **Per-dataset comparison with Xi & Li (2021).** They ranked DoubletFinder first on
-      AUPRC; here it is last among tools. Compare every tool's per-dataset AUPRC with their
-      table: each large gap is either a bug or a finding. Log the chosen pK on all 16
-      datasets and run the fixed-pK sweep on all 16, not 3.
-- [ ] **Realistic expected-rate setting.** The main run gives rate-taking tools the labeled
-      rate, which no user has. This favours scDblFinder, Scrublet, DoubletFinder and Chord in
-      the F1 comparison. Add a run with tool defaults (`dbr = NULL`, Scrublet 0.1) or the 10x
-      loading heuristic.
-- [ ] **Paired effect sizes.** Cliff's δ is computed unpaired over the 16 values, so dataset
-      difficulty swamps it (scDblFinder vs vaeda: δ = 0.04). Keep it as committed, but add a
-      paired effect size (matched-pairs rank-biserial, or median paired difference with a
-      bootstrap CI). Datasets are not independent (5 lupus PBMC, 3 HMEC, 2 species mixes):
-      add a sensitivity analysis that averages within study first.
+- [x] **Independent validation of scDblFinder.** On singletCode data (6 T47D samples, 36
+      datasets with simulated doublets; no tool was tuned on them), scDblFinder still ranks
+      first overall (report §3.10). Its lead depends on doublet depth: with singlet-sized
+      doublets, Scrublet, vaeda and DoubletDensity are better. This also reconciles our
+      result with Zhang et al. (2024), who used averaged doublets and found scDblFinder last.
+      The abstract states both.
+- [x] **Label noise is not tool-neutral.** Confirmed on `hm-12k`/`hm-6k`: about as many
+      same-species doublets are expected as labeled ones, and Solo's and bcds' top "false
+      positives" have a median 1.9–2.0× the library of their own species (85–90% above 1.6×,
+      vs 8.5% of singlets). Lineage co-expression shows that the PBMC labels miss about a third
+      of heterotypic doublets (report §3.12–3.13).
+- [x] **Per-dataset comparison with Xi & Li (2021).** Six of eight comparable tools reproduce
+      (within 0.005 mean AUPRC for scds, Scrublet, scDblFinder). DoubletFinder's gap (0.42 vs
+      0.54) is about half pK: BCmvn's choice (logged for all 16 datasets) costs 0.06, and the
+      best fixed pK per dataset still stays 0.05 below. The pK claim in the report was softened
+      accordingly. Solo's gap on the species mixtures is not the HVG choice; see the original
+      Solo run (report §3.12).
+- [x] **Realistic expected-rate setting.** With the 10x guideline, scDblFinder's F1 is
+      unchanged (0.49 → 0.50); DoubletFinder (0.37 → 0.32), Chord and Scrublet lose. The
+      labeled rate flattered them, not scDblFinder (report §3.3).
+- [x] **Paired effect sizes and study dependence.** Matched-pairs rank-biserial and bootstrap
+      CIs of the median paired difference added (scDblFinder vs vaeda: r = 0.40, 0.015
+      [−0.011, 0.026]). Averaging within study first gives the same ranking (p = 3.5·10⁻⁸).
 
 ### Smaller fixes
 
-- [ ] Downstream: the reseed reference does not change HVGs, so HVG Jaccard (0.835 vs 0.87)
-      has no noise floor. Add a "remove k random droplets" reference.
-- [ ] Simulation: one draw per scenario at one rate, so there are no error bars. Add
-      replicates; estimate the real doublet/singlet library-size ratio from the labeled data
-      to say which `f` is realistic.
-- [ ] F1 statistics: DoubletDensity has no calls; drop it from the Friedman test on F1.
-- [ ] Milestone table: singletCode is ticked for dimensions 1–14 but has not run yet; "sel"
-      is hard to read.
-- [ ] References: Chord is *Communications Biology* 5, 510 (2022) in the proposal but
-      *Briefings in Bioinformatics* in `report.md`; check which is right. Cite and discuss
-      Zhang et al. (2024) in the report.
-- [ ] Reproducibility: `agreement.py`, `stability.py` and `downstream.py` need
-      `results/pred/`, which is not in git. Deposit it on Zenodo.
-- [ ] Be able to explain every compatibility shim, especially the xgboost one: bcds, hybrid
-      and Chord depend on it being correct.
+- [x] Downstream noise floor: "remove k random droplets" and "oracle minus k random
+      singlets" references. HVG differences between most tools are within that noise.
+- [x] Simulation replicates (3 draws; SD mostly 0.01–0.04) and the real doublet/singlet
+      library ratio (median 1.66, range 0.89–1.91). Abundance-weighted heterotypic pairing
+      added.
+- [x] DoubletDensity dropped from the F1 Friedman test (10 callers; p = 3.1·10⁻⁵, 4 of 45
+      pairs significant).
+- [ ] Milestone table in `report/milestone2_design.docx`: singletCode ticks and "sel" (to be
+      edited by hand).
+- [x] References: Chord is *Communications Biology* 5, 510 (2022). Zhang et al. (2024) cited
+      and discussed. All references checked against the proposal.
+- [ ] Reproducibility: deposit `results/pred/` on Zenodo.
+- [x] Compatibility shims: evidence that they preserve behaviour added above.
 
-### Worth adding (in order of value for effort)
+### Worth adding
 
-1. **Simple ensemble.** Rank-average 2–3 top tools, evaluated leave-one-dataset-out. The
-   predictions already exist, and the 57% vs 74% recall gap (best single vs oracle union)
-   suggests room. Chord losing to its own components makes this a useful contrast.
-2. **Scaling to 100k–200k droplets.** 26k is small by current standards; timing needs no
-   labels, and out-of-memory failures are themselves a finding.
-3. **Lineage co-expression (dimension 15).** Note that it can only confirm heterotypic
-   doublets.
-4. **Label-free pK rule for DoubletFinder**, tested on singletCode data so it is not tuned
-   on the test set.
+1. [x] **Simple ensemble** with leave-one-dataset-out selection: no gain over scDblFinder
+   (0.561 vs 0.563). Chord's GBM is worse than a rank average of its own components.
+2. [ ] **Scaling to 100k–200k droplets**: not done; stated as a limitation.
+3. [x] **Lineage co-expression (dimension 15)**: report §3.13.
+4. [x] **Label-free pK rule for DoubletFinder**, tested on singletCode data (report §3.10).
 
 ## References
 
 - Xi, N. M. & Li, J. J. Benchmarking computational doublet-detection methods for single-cell
   RNA sequencing data. *Cell Systems* 12, 176–194 (2021).
-- Zhang, Z. et al. *Cell Genomics* 4, 100592 (2024).
+- Zhang, Z., Melzer, M. E. et al. Synthetic DNA barcodes identify singlets in scRNA-seq
+  datasets and evaluate doublet algorithms. *Cell Genomics* 4, 100592 (2024).
 - Tool references are listed in the proposal.

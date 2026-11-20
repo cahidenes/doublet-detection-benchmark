@@ -93,3 +93,23 @@ if sweep.exists():
     pk_s = pd.DataFrame(rows)
     pk_s.to_csv(STATS / "df_pk_summary.tsv", sep="\t", index=False, float_format="%.4f")
     print("\n", pk_s.round(3).to_string(index=False))
+
+# Solo: the original package (solo-sc 0.6, analysis/solo_original.py) vs scvi-tools SOLO (main run)
+# vs Xi & Li, on the same matrices. Same metric functions as scripts/evaluate.py.
+s0 = ROOT / "results/sensitivity/solo0"
+if s0.exists() and any(s0.glob("*.tsv")):
+    from sklearn.metrics import average_precision_score, roc_auc_score
+    rows = []
+    sol = c[c.tool == "solo"].set_index("dataset")
+    for f in sorted(s0.glob("*.tsv")):
+        p = pd.read_csv(f, sep="\t")
+        y = pd.read_csv(ROOT / f"data/processed/{f.stem}/labels.tsv", sep="\t").set_index("barcode") \
+            .is_doublet.loc[p.barcode].to_numpy()
+        rows.append({"dataset": f.stem, "auprc_original": average_precision_score(y, p.score),
+                     "auroc_original": roc_auc_score(y, p.score),
+                     "auprc_scvitools": sol.auprc_ours.get(f.stem), "auprc_xili": sol.auprc_xili.get(f.stem)})
+    so = pd.DataFrame(rows)
+    so["d_original_vs_xili"] = so.auprc_original - so.auprc_xili
+    so = pd.concat([so, pd.DataFrame([{"dataset": "mean", **so.drop(columns="dataset").mean()}])])
+    so.to_csv(STATS / "solo_original.tsv", sep="\t", index=False, float_format="%.4f")
+    print("\nOriginal Solo vs scvi-tools SOLO vs Xi & Li:\n", so.round(3).to_string(index=False))
